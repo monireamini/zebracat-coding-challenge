@@ -7,20 +7,18 @@ import { VideoWithOverlays } from '../remotion/Root';
 export default function Home() {
     const [isExporting, setIsExporting] = useState(false);
     const [exportMessage, setExportMessage] = useState('');
-    const [exportLogs, setExportLogs] = useState('');
     const [inputProps, setInputProps] = useState({
         videoData: '/BigBuckBunny.mp4',
         textOverlays: [
-            { text: 'Hello', position: '100,0', startFrame: 0, endFrame: 90 },
-            { text: 'World', position: '170,0', startFrame: 60, endFrame: 90 },
-            { text: 'Always Visible', position: '100,200' },
+            { text: 'Hello', position: '100,200', startFrame: 0, endFrame: 90 },
+            { text: 'World', position: '170,200', startFrame: 60, endFrame: 90 },
+            { text: 'Always Visible', position: '200,400' },
         ]
     });
 
     const handleExportVideo = async () => {
         setIsExporting(true);
         setExportMessage('Exporting video...');
-        setExportLogs('');
 
         try {
             console.log('Sending export request...');
@@ -51,7 +49,6 @@ export default function Home() {
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
                 setExportMessage('Video exported successfully! Check your downloads.');
-                setExportLogs(`stdout: ${data.stdout}\n\nstderr: ${data.stderr}`);
             } else {
                 console.log('Response not OK, getting error details...');
                 const text = await response.text();
@@ -82,12 +79,6 @@ export default function Home() {
                     {/* @todo: use a snackbar for this */}
                     {/*{exportMessage && (*/}
                     {/*    <p className="mt-4 text-sm text-gray-600">{exportMessage}</p>*/}
-                    {/*)}*/}
-                    {/*{exportLogs && (*/}
-                    {/*    <div className="w-full mt-4 p-4 bg-gray-100 rounded">*/}
-                    {/*        <h3 className="font-bold">Export Logs:</h3>*/}
-                    {/*        <pre className="whitespace-pre-wrap">{exportLogs}</pre>*/}
-                    {/*    </div>*/}
                     {/*)}*/}
                 </div>
             </div>

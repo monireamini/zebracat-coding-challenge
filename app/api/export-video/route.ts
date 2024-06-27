@@ -22,7 +22,8 @@ export async function POST(request: Request) {
         console.log('Cleaning up temp file');
         await fs.unlink('temp-input-props.json');
 
-        const videoPath = path.resolve(process.cwd(), 'out', 'video1.mp4');
+        // @todo: keep this name consistent everywhere: video.mp4
+        const videoPath = path.resolve(process.cwd(), 'out', 'video.mp4');
         console.log('Video path:', videoPath);
 
         console.log('Reading video file');
