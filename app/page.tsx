@@ -76,10 +76,6 @@ export default function Home() {
                     >
                         {isExporting ? 'Exporting...' : 'Export Video'}
                     </button>
-                    {/* @todo: use a snackbar for this */}
-                    {/*{exportMessage && (*/}
-                    {/*    <p className="mt-4 text-sm text-gray-600">{exportMessage}</p>*/}
-                    {/*)}*/}
                 </div>
             </div>
 
