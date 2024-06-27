@@ -1,8 +1,11 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, {useCallback, useState} from 'react';
 import { Player } from '@remotion/player';
 import { VideoWithOverlays } from '../remotion/Root';
+import TextOverlayEditor from '../components/TextOverlayEditor';
+
+
 
 export default function Home() {
     const [isExporting, setIsExporting] = useState(false);
@@ -63,6 +66,17 @@ export default function Home() {
         }
     };
 
+    const handleOverlaysChange = useCallback((newOverlays) => {
+        setInputProps(prev => ({
+            ...prev,
+            textOverlays: newOverlays.map(overlay => ({
+                text: overlay.text,
+                position: `${Math.round(overlay.position.x)},${Math.round(overlay.position.y)}`,
+                // You might want to add logic here to set startFrame and endFrame
+            }))
+        }));
+    }, []);
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6">
             <div className="flex flex-row w-full justify-between items-center mb-4">
@@ -79,21 +93,42 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* editor area for drag and drop texts*/}
-            <div>
-            </div>
+            {exportMessage && (
+                <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>
+            )}
 
-            {/* result video */}
-            <div className="w-full flex justify-center">
-                <Player
-                    component={VideoWithOverlays}
-                    durationInFrames={30 * 30}
-                    compositionWidth={1280}
-                    compositionHeight={720}
-                    fps={30}
-                    controls
-                    inputProps={inputProps}
-                />
+            <h2 className="text-xl font-bold mb-4 text-white self-start">Video Preview and Text Editor</h2>
+
+            {/* Video player and overlay editor container */}
+            <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
+                {/* Video player */}
+                <div className="absolute inset-0">
+                    <Player
+                        component={VideoWithOverlays}
+                        durationInFrames={30 * 30}
+                        compositionWidth={1280}
+                        compositionHeight={720}
+                        fps={30}
+                        clickToPlay={false}
+                        controls
+                        inputProps={inputProps}
+                    />
+                </div>
+
+                {/* Text overlay editor */}
+                <div className="absolute inset-0 pointer-events-none">
+                    <TextOverlayEditor
+                        initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
+                            id: `overlay-${index}`,
+                            text: overlay.text,
+                            position: {
+                                x: parseInt(overlay.position.split(',')[0]),
+                                y: parseInt(overlay.position.split(',')[1])
+                            }
+                        }))}
+                        onOverlaysChange={handleOverlaysChange}
+                    />
+                </div>
             </div>
         </main>
     )
