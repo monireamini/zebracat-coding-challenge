@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
-import {DndContext, DragEndEvent, useDraggable, useDroppable} from '@dnd-kit/core';
+import React, { useState } from 'react';
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 
 interface TextOverlay {
     id: string;
     text: string;
     position: { x: number; y: number };
+    startFrame?: number;
+    endFrame?: number;
 }
 
 interface TextOverlayEditorProps {
@@ -12,12 +14,12 @@ interface TextOverlayEditorProps {
     onOverlaysChange: (overlays: TextOverlay[]) => void;
 }
 
-const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange}) => {
+const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, onOverlaysChange }) => {
     const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
     const [editingId, setEditingId] = useState<string | null>(null);
 
     const handleDragEnd = (event: DragEndEvent) => {
-        const {active, delta} = event;
+        const { active, delta } = event;
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
                 overlay.id === active.id
@@ -36,7 +38,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
     const handleTextChange = (id: string, newText: string) => {
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
-                overlay.id === id ? {...overlay, text: newText} : overlay
+                overlay.id === id ? { ...overlay, text: newText } : overlay
             )
         );
     };
@@ -45,7 +47,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
         const newOverlay: TextOverlay = {
             id: `overlay-${Date.now()}`,
             text: 'New Text',
-            position: {x: 50, y: 50},
+            position: { x: 50, y: 50 },
         };
         setOverlays([...overlays, newOverlay]);
     };
@@ -54,7 +56,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
         onOverlaysChange(overlays);
     }, [overlays, onOverlaysChange]);
 
-    const {setNodeRef} = useDroppable({
+    const { setNodeRef } = useDroppable({
         id: 'editor-area',
     });
 
@@ -97,7 +99,7 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                                                                onStartEditing,
                                                                onStopEditing,
                                                            }) => {
-    const {attributes, listeners, setNodeRef, transform} = useDraggable({
+    const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: overlay.id,
     });
 
@@ -107,6 +109,11 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
         }
         : undefined;
 
+    const handleDoubleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onStartEditing();
+    };
+
     return (
         <div
             ref={setNodeRef}
@@ -115,7 +122,10 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                 position: 'absolute',
                 left: overlay.position.x,
                 top: overlay.position.y,
-                cursor: 'move',
+                cursor: isEditing ? 'text' : 'move',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                color: 'white',
             }}
             {...attributes}
             {...listeners}
@@ -127,12 +137,16 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                     onChange={(e) => onTextChange(e.target.value)}
                     onBlur={onStopEditing}
                     autoFocus
-                    className="bg-transparent border-none outline-none text-white"
+                    className="bg-transparent border-none outline-none text-white text-2xl font-bold"
+                    style={{
+                        textShadow: '0 0 5px black',
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                 />
             ) : (
-                <span onDoubleClick={onStartEditing} className="text-white">
-          {overlay.text}
-        </span>
+                <span onDoubleClick={handleDoubleClick} className="text-white">
+                    {overlay.text}
+                </span>
             )}
         </div>
     );
