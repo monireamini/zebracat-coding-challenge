@@ -8,6 +8,9 @@ const fs = require('fs').promises;
 
 const execFilePromise = promisify(execFile);
 
+fs.mkdir(path.join(__dirname, 'out'), {recursive: true})
+    .catch(console.error);
+
 const getVideoDuration = async (videoPath) => {
     try {
         const {stdout} = await execFilePromise(ffprobe.path, [
@@ -28,6 +31,7 @@ const getVideoDuration = async (videoPath) => {
 
 const readVideoFile = async (videoPath) => {
     try {
+        console.log('Attempting to read video file from:', videoPath);
         const data = await fs.readFile(videoPath);
         return `data:video/mp4;base64,${data.toString('base64')}`;
     } catch (error) {
@@ -37,48 +41,60 @@ const readVideoFile = async (videoPath) => {
 };
 
 const start = async () => {
-    // The composition you want to render
-    const compositionId = 'VideoWithOverlays';
+    console.log('Starting render process...');
+    try {
+        // Read input props from the temporary file
+        const inputPropsPath = process.argv[2];
+        console.log('Input props path:', inputPropsPath);
+        const inputPropsJson = await fs.readFile(inputPropsPath, 'utf-8');
+        const inputProps = JSON.parse(inputPropsJson);
+        console.log('Input props:', JSON.stringify(inputProps, null, 2));
 
-    // You can ignore this, as we will pass the input props directly to renderMedia
-    const bundleLocation = await bundle(require.resolve('./remotion/index.ts'));
+        // The composition you want to render
+        const compositionId = 'VideoWithOverlays';
 
-    const videoPath = path.resolve(__dirname, './public/BigBuckBunny.mp4');
-    const videoData = await readVideoFile(videoPath);
-    const durationInSeconds = await getVideoDuration(videoPath);
+        const bundleLocation = await bundle(require.resolve('./remotion/index.ts'));
 
-    if (durationInSeconds === null) {
-        console.error('Failed to get video duration. Using default duration.');
-        return;
+        // Correct the video path
+        const videoPath = path.resolve(__dirname, 'public', inputProps.videoData.replace(/^\//, ''));
+        console.log('Resolved video path:', videoPath);
+
+        const videoData = await readVideoFile(videoPath);
+        const durationInSeconds = await getVideoDuration(videoPath);
+
+        if (durationInSeconds === null) {
+            console.error('Failed to get video duration. Using default duration.');
+            return;
+        }
+
+        const durationInFrames = Math.round(durationInSeconds * 30); // Assuming 30 fps
+
+        console.log('Video path:', videoPath);
+        console.log('Duration in seconds:', durationInSeconds);
+        console.log('Duration in frames:', durationInFrames);
+
+        const compositions = await getCompositions(bundleLocation, {
+            inputProps: { ...inputProps, videoData },
+        });
+
+        const composition = compositions.find((c) => c.id === compositionId);
+
+        console.log('Starting renderMedia...');
+        await renderMedia({
+            composition: {
+                ...composition,
+                durationInFrames,
+            },
+            serveUrl: bundleLocation,
+            codec: 'h264',
+            outputLocation: 'out/video6.mp4',
+            inputProps: { ...inputProps, videoData },
+        });
+
+        console.log('Render complete');
+    } catch (error) {
+        console.error('Error in render process:', error);
     }
-
-    const durationInFrames = Math.round(durationInSeconds * 30); // Assuming 30 fps
-
-    const inputProps = {
-        videoData,
-        textOverlays: [
-            {text: 'Hello', position: '100,400', startFrame: 0, endFrame: 90},
-            {text: 'World', position: '170,400', startFrame: 60, endFrame: 90},
-            {text: 'Always Visible', position: '100,500'},
-        ]
-    };
-
-    const compositions = await getCompositions(bundleLocation, {
-        inputProps,
-    });
-
-    const composition = compositions.find((c) => c.id === compositionId);
-
-    await renderMedia({
-        composition: {
-            ...composition,
-            durationInFrames,
-        },
-        serveUrl: bundleLocation,
-        codec: 'h264',
-        outputLocation: 'out/video1.mp4',
-        inputProps,
-    });
 };
 
 start().catch(console.error);

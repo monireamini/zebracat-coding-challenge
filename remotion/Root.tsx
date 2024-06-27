@@ -42,10 +42,10 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
 };
 
 export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, textOverlays = [] }) => {
-    const { durationInFrames } = useVideoConfig();
+    const { durationInFrames, width, height } = useVideoConfig();
 
     return (
-        <div style={{flex: 1, backgroundColor: 'black', position: 'relative'}}>
+        <div style={{flex: 1, backgroundColor: 'black', position: 'relative', width, height}}>
             <Video src={videoData} />
             {textOverlays.map((overlay, index) => {
                 const startFrame = overlay.startFrame ?? 0;
