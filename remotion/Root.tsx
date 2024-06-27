@@ -1,14 +1,27 @@
 import React from 'react';
 import {
     Composition,
-    getInputProps,
     Sequence,
     useVideoConfig,
     Video,
 } from 'remotion';
 
-// TextOverlay component to render each text overlay
-const TextOverlay = ({text, position}) => {
+interface TextOverlayProps {
+    text: string;
+    position: string;
+}
+
+interface Overlay extends TextOverlayProps {
+    startFrame?: number;
+    endFrame?: number;
+}
+
+interface VideoWithOverlaysProps {
+    videoData: string;
+    textOverlays: Overlay[];
+}
+
+const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
     const [x, y] = position.split(',').map(Number);
 
     return (
@@ -28,11 +41,8 @@ const TextOverlay = ({text, position}) => {
     );
 };
 
-// Main component
-export const VideoWithOverlays = () => {
-    const {videoData, textOverlays} = getInputProps();
-
-    const {durationInFrames} = useVideoConfig();
+export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, textOverlays = [] }) => {
+    const { durationInFrames } = useVideoConfig();
 
     return (
         <div style={{flex: 1, backgroundColor: 'black', position: 'relative'}}>
@@ -56,19 +66,21 @@ export const VideoWithOverlays = () => {
     );
 };
 
-// Remotion composition
-export const RemotionRoot = () => {
-    const {videoData, textOverlays} = getInputProps();
-
+export const RemotionRoot: React.FC = () => {
     return (
         <Composition
             id="VideoWithOverlays"
             component={VideoWithOverlays}
-            durationInFrames={30 * 30} // Adjust this based on your video duration: 30 seconds
+            durationInFrames={30 * 30}
             fps={30}
             width={1280}
             height={720}
-            defaultProps={{videoData, textOverlays}}
+            defaultProps={{
+                videoData: '/BigBuckBunny.mp4',
+                textOverlays: [
+                    { text: 'Default Text', position: '100,100' }
+                ]
+            }}
         />
     );
-}
+};

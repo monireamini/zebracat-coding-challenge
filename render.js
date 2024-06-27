@@ -1,8 +1,8 @@
-const { bundle } = require('@remotion/bundler');
-const { getCompositions, renderMedia } = require('@remotion/renderer');
+const {bundle} = require('@remotion/bundler');
+const {getCompositions, renderMedia} = require('@remotion/renderer');
 const ffprobe = require('ffprobe-static');
-const { execFile } = require('child_process');
-const { promisify } = require('util');
+const {execFile} = require('child_process');
+const {promisify} = require('util');
 const path = require('path');
 const fs = require('fs').promises;
 
@@ -10,7 +10,7 @@ const execFilePromise = promisify(execFile);
 
 const getVideoDuration = async (videoPath) => {
     try {
-        const { stdout } = await execFilePromise(ffprobe.path, [
+        const {stdout} = await execFilePromise(ffprobe.path, [
             '-v',
             'error',
             '-show_entries',
@@ -57,10 +57,10 @@ const start = async () => {
     const inputProps = {
         videoData,
         textOverlays: [
-            { text: 'Hello', position: '100,100', startFrame: 0, endFrame: 90 },
-            { text: 'World', position: '200,100', startFrame: 60, endFrame: 90 },
-            { text: 'Always Visible', position: '400,500' }, // No startFrame or endFrame
-        ],
+            {text: 'Hello', position: '100,400', startFrame: 0, endFrame: 90},
+            {text: 'World', position: '170,400', startFrame: 60, endFrame: 90},
+            {text: 'Always Visible', position: '100,500'},
+        ]
     };
 
     const compositions = await getCompositions(bundleLocation, {
@@ -76,7 +76,7 @@ const start = async () => {
         },
         serveUrl: bundleLocation,
         codec: 'h264',
-        outputLocation: 'out/video10.mp4',
+        outputLocation: 'out/video1.mp4',
         inputProps,
     });
 };
