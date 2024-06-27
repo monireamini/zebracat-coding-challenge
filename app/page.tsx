@@ -1,8 +1,8 @@
 'use client'
 
 import React, {useCallback, useState} from 'react';
-import { Player } from '@remotion/player';
-import { VideoWithOverlays } from '../remotion/Root';
+import {Player} from '@remotion/player';
+import {VideoWithOverlays} from '../remotion/Root';
 import TextOverlayEditor from '../components/TextOverlayEditor';
 
 export default function Home() {
@@ -11,9 +11,9 @@ export default function Home() {
     const [inputProps, setInputProps] = useState({
         videoData: '/BigBuckBunny.mp4',
         textOverlays: [
-            { text: 'Hello', position: '100,200', startFrame: 0, endFrame: 90 },
-            { text: 'World', position: '170,200', startFrame: 60, endFrame: 90 },
-            { text: 'Always Visible', position: '200,400' },
+            {text: 'Hello', position: '100,200', startFrame: 0, endFrame: 90},
+            {text: 'World', position: '170,200', startFrame: 60, endFrame: 90},
+            {text: 'Always Visible', position: '200,400'},
         ]
     });
 
@@ -42,14 +42,44 @@ export default function Home() {
                         disabled={isExporting}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                     >
-                        {isExporting ? 'Exporting...' : 'Export Video'}
+                        {isExporting ? 'Exporting...' : 'Export'}
                     </button>
                 </div>
             </div>
 
-            {exportMessage && (
-                <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>
-            )}
+            <div className="flex flex-row w-full justify-between items-center mb-4">
+                <div className="flex flex-row w-full justify-start items-center mb-4">
+                    <h1 className="text-lg text-white mr-4">Add New |</h1>
+
+                    <div className="flex flex-col items-center">
+                        <button
+                            onClick={handleExportVideo}
+                            disabled={isExporting}
+                            className="text-white px-4 hover:bg-blue-500 rounded-xl"
+                        >
+                            Text
+                        </button>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                        <button
+                            onClick={handleExportVideo}
+                            disabled={isExporting}
+                            className="text-white px-4 hover:bg-blue-500 rounded-xl"
+                        >
+                            Emoji
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex flex-row w-full justify-start items-center mb-4">
+                    <h1 className="text-lg text-white mr-4">Aspect Ratio | 16:9</h1>
+                </div>
+            </div>
+
+            {/*{exportMessage && (*/}
+            {/*    <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>*/}
+            {/*)}*/}
 
             <h2 className="text-xl font-bold mb-4 text-white self-start">Video Preview and Text Editor</h2>
 
