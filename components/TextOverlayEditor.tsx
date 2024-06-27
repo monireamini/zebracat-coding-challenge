@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface TextOverlay {
     id: string;
@@ -126,27 +128,28 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                 fontSize: '24px',
                 fontWeight: 'bold',
                 color: 'white',
+                textShadow: '0 0 5px black',
             }}
             {...attributes}
             {...listeners}
         >
             {isEditing ? (
-                <input
-                    type="text"
-                    value={overlay.text}
-                    onChange={(e) => onTextChange(e.target.value)}
-                    onBlur={onStopEditing}
-                    autoFocus
-                    className="bg-transparent border-none outline-none text-white text-2xl font-bold"
-                    style={{
-                        textShadow: '0 0 5px black',
+                <CKEditor
+                    editor={ClassicEditor}
+                    data={overlay.text}
+                    onChange={(event, editor) => {
+                        const data = editor.getData();
+                        onTextChange(data);
                     }}
-                    onClick={(e) => e.stopPropagation()}
+                    onBlur={(event, editor) => {
+                        onStopEditing();
+                    }}
+                    config={{
+                        toolbar: ['bold', 'italic', 'link'],
+                    }}
                 />
             ) : (
-                <span onDoubleClick={handleDoubleClick} className="text-white">
-                    {overlay.text}
-                </span>
+                <span onDoubleClick={handleDoubleClick} className="text-white" dangerouslySetInnerHTML={{ __html: overlay.text }}></span>
             )}
         </div>
     );

@@ -35,9 +35,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
                 color: 'white',
                 textShadow: '0 0 5px black',
             }}
-        >
-            {text}
-        </div>
+            dangerouslySetInnerHTML={{ __html: text }}
+        />
     );
 };
 
