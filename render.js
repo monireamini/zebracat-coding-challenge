@@ -80,6 +80,7 @@ const start = async () => {
         const composition = compositions.find((c) => c.id === compositionId);
 
         console.log('Starting renderMedia...');
+        const outputLocation = 'out/video.mp4';
         await renderMedia({
             composition: {
                 ...composition,
@@ -87,13 +88,15 @@ const start = async () => {
             },
             serveUrl: bundleLocation,
             codec: 'h264',
-            outputLocation: 'out/video6.mp4',
+            outputLocation,
             inputProps: { ...inputProps, videoData },
         });
 
         console.log('Render complete');
+        return outputLocation; // Return the path of the generated video
     } catch (error) {
         console.error('Error in render process:', error);
+        throw error;
     }
 };
 

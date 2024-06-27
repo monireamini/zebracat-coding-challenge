@@ -23,6 +23,7 @@ export default function Home() {
         setExportLogs('');
 
         try {
+            console.log('Sending export request...');
             const response = await fetch('/api/export-video', {
                 method: 'POST',
                 headers: {
@@ -30,15 +31,35 @@ export default function Home() {
                 },
                 body: JSON.stringify(inputProps),
             });
-            const data = await response.json();
+
+            console.log('Response received:', response.status, response.statusText);
 
             if (response.ok) {
-                setExportMessage(data.message);
+                console.log('Response is OK, getting blob...');
+                const blob = await response.blob();
+                console.log('Blob received, size:', blob.size);
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                // @todo: generate a random name for video file
+                a.download = 'exported_video.mp4';
+                document.body.appendChild(a);
+                console.log('Download link created, clicking...');
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                setExportMessage('Video exported successfully! Check your downloads.');
                 setExportLogs(`stdout: ${data.stdout}\n\nstderr: ${data.stderr}`);
             } else {
-                throw new Error(data.error || 'Failed to export video');
+                console.log('Response not OK, getting error details...');
+                const text = await response.text();
+                console.log('Error details:', text);
+                throw new Error(text || 'Failed to export video');
             }
         } catch (error) {
+            console.error('Error in export process:', error);
             setExportMessage(`Error: ${error.message}`);
         } finally {
             setIsExporting(false);
