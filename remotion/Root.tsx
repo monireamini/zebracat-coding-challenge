@@ -42,12 +42,23 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
     );
 };
 
-export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, textOverlays = [], videoSize }) => {
+export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, videoPosition, textOverlays = [], videoSize }) => {
     const { durationInFrames } = useVideoConfig();
+    const [videoX, videoY] = videoPosition.split(',').map(Number);
 
     return (
         <div style={{flex: 1, backgroundColor: 'black', position: 'relative', width: videoSize.width, height: videoSize.height}}>
-            <Video src={videoData} />
+            <Video
+                src={videoData}
+                style={{
+                    position: 'absolute',
+                    left: videoX,
+                    top: videoY,
+                    width: 320,
+                    height: 180,
+                }}
+            />
+
             {textOverlays.map((overlay, index) => {
                 const startFrame = overlay.startFrame ?? 0;
                 const endFrame = overlay.endFrame ?? durationInFrames;
@@ -78,6 +89,7 @@ export const RemotionRoot: React.FC = () => {
             height={720}
             defaultProps={{
                 videoData: '/BigBuckBunny.mp4',
+                videoPosition: '0,0',
                 textOverlays: [
                     { text: 'Default Text', position: '100,100' }
                 ],

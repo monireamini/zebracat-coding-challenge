@@ -12,6 +12,7 @@ export default function Home() {
     const [exportMessage, setExportMessage] = useState('');
     const [inputProps, setInputProps] = useState({
         videoData: '',
+        videoPosition: '0,0',
         textOverlays: [
             {text: 'Hello', position: '100,200'},
             {text: 'World', position: '170,200'},
