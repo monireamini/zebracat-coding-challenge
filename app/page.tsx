@@ -215,7 +215,8 @@ export default function Home() {
             </div>
 
             {inputProps.videoData ? (
-                <div className="relative w-full" style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
+                <div className="relative w-full border-2 border-green-500 rounded-[8px]"
+                     style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
                     {/* Video player */}
                     <div className="absolute inset-0">
                         <Player
