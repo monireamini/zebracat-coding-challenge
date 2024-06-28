@@ -14,9 +14,7 @@ export default function Home() {
         videoData: '',
         videoPosition: '0,0',
         textOverlays: [
-            {text: 'Hello', position: '100,200'},
-            {text: 'World', position: '170,200'},
-            {text: 'Always Visible', position: '200,400'},
+            {id: "1", text: 'Initial Text', position: '100,200'},
         ]
     });
     const [isUploading, setIsUploading] = useState(false);
@@ -81,18 +79,16 @@ export default function Home() {
         }
     };
 
-    const handleOverlaysChange = useCallback((newOverlays) => {
+    const handleSetOverlays = (newOverlays) => {
         setInputProps(prev => ({
             ...prev,
-            textOverlays: newOverlays.map(overlay => ({
-                ...overlay,
-                position: `${Math.round(overlay.position.x)},${Math.round(overlay.position.y)}`,
-            }))
+            textOverlays: newOverlays
         }));
-    }, []);
+    }
 
     const addNewTextOverlay = () => {
         const newOverlay = {
+            id: Date.now(),
             text: 'New Text',
             position: '50,50',
         };
@@ -187,16 +183,13 @@ export default function Home() {
                     {/*    <p className="mt-2 text-sm text-gray-300">{uploadMessage}</p>*/}
                     {/*)}*/}
 
-                    <h1 className="text-lg text-white mr-4">Add New |</h1>
-
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={addNewTextOverlay}
-                            className="text-white px-4 hover:bg-blue-500 rounded-xl"
-                        >
-                            Text
-                        </button>
-                    </div>
+                    <button
+                        onClick={addNewTextOverlay}
+                        disabled={!inputProps.videoData}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                    >
+                        Add Text
+                    </button>
                 </div>
 
                 {inputProps.videoData && (
@@ -241,17 +234,8 @@ export default function Home() {
                     {/* Text overlay editor */}
                     <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
                         <TextOverlayEditor
-                            initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
-                                id: `overlay-${index}`,
-                                text: overlay.text,
-                                position: {
-                                    x: parseInt(overlay.position.split(',')[0]),
-                                    y: parseInt(overlay.position.split(',')[1])
-                                },
-                                startFrame: overlay.startFrame,
-                                endFrame: overlay.endFrame
-                            }))}
-                            onOverlaysChange={handleOverlaysChange}
+                            overlays={inputProps.textOverlays}
+                            setOverlays={handleSetOverlays}
                             compositionSize={compositionSize}
                         />
                     </div>

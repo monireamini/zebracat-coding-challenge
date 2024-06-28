@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, Dispatch, SetStateAction} from 'react';
 import {DndContext, DragEndEvent, useDraggable, useDroppable} from '@dnd-kit/core';
 
 interface TextOverlay {
@@ -10,20 +10,19 @@ interface TextOverlay {
 }
 
 interface TextOverlayEditorProps {
-    initialOverlays: TextOverlay[];
-    onOverlaysChange: (overlays: TextOverlay[]) => void;
+    overlays: TextOverlay[];
+    setOverlays: (overlays: TextOverlay[]) => void;
     compositionSize: { width: number; height: number };
 }
 
-const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange, compositionSize}) => {
-    const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
+const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({
+                                                                 overlays,
+                                                                 setOverlays,
+                                                                 compositionSize
+                                                             }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState({x: 1, y: 1});
-
-    useEffect(() => {
-        onOverlaysChange(overlays);
-    }, [overlays, onOverlaysChange]);
 
     useEffect(() => {
         const updateScale = () => {
@@ -44,27 +43,24 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
 
     const handleDragEnd = (event: DragEndEvent) => {
         const {active, delta} = event;
-        setOverlays((prevOverlays) =>
-            prevOverlays.map((overlay) =>
-                overlay.id === active.id
+        setOverlays(overlays.map((overlay) => {
+                const x = parseInt(overlay.position.split(',')[0])
+                const y = parseInt(overlay.position.split(',')[1])
+
+                return overlay.id === active.id
                     ? {
                         ...overlay,
-                        position: {
-                            x: Math.min(Math.max(0, overlay.position.x + delta.x / scale.x), compositionSize.width),
-                            y: Math.min(Math.max(0, overlay.position.y + delta.y / scale.y), compositionSize.height),
-                        },
+                        position: `${Math.min(Math.max(0, x + delta.x / scale.x), compositionSize.width)},${Math.min(Math.max(0, y + delta.y / scale.y), compositionSize.height)}`
                     }
                     : overlay
-            )
-        );
+            }
+        ))
     };
 
     const handleTextChange = (id: string, newText: string) => {
-        setOverlays((prevOverlays) =>
-            prevOverlays.map((overlay) =>
-                overlay.id === id ? {...overlay, text: newText} : overlay
-            )
-        );
+        setOverlays(overlays.map((overlay) =>
+            overlay.id === id ? {...overlay, text: newText} : overlay
+        ));
     };
 
     const {setNodeRef} = useDroppable({
@@ -121,13 +117,16 @@ const DraggableOverlay = ({overlay, isEditing, onTextChange, onStartEditing, onS
         onTextChange(e.target.value);
     };
 
+    const x = parseInt(overlay.position.split(',')[0])
+    const y = parseInt(overlay.position.split(',')[1])
+
     return (
         <div
             className="pointer-events-auto"
             style={{
                 position: 'absolute',
-                left: overlay.position.x * scale.x,
-                top: overlay.position.y * scale.y,
+                left: x * scale.x,
+                top: y * scale.y,
             }}
         >
             {isEditing ? (
