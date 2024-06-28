@@ -80,7 +80,7 @@ const start = async () => {
         const composition = compositions.find((c) => c.id === compositionId);
 
         console.log('Starting renderMedia...');
-        const outputLocation = path.resolve(__dirname, 'out', `video-${Date.now()}.mp4`);
+        const outputLocation = 'out/video.mp4';
         await renderMedia({
             composition: {
                 ...composition,
