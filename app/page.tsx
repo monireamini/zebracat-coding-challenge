@@ -155,10 +155,6 @@ export default function Home() {
         return `${width / divisor}:${height / divisor}`;
     }
 
-    const handleVideoResize = (newSize: { width: number; height: number }) => {
-        setVideoSize(newSize);
-    };
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-center mb-4">
@@ -234,13 +230,7 @@ export default function Home() {
                             fps={30}
                             clickToPlay={false}
                             controls
-                            inputProps={{
-                                ...inputProps,
-                                videoSize,
-                                compositionSize,
-                                textOverlays: [],
-                                onVideoResize: handleVideoResize
-                            }}
+                            inputProps={{...inputProps, videoSize, compositionSize, textOverlays: []}}
                             style={{
                                 width: '100%',
                                 height: '100%',
