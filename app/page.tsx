@@ -11,8 +11,8 @@ export default function Home() {
     const [inputProps, setInputProps] = useState({
         videoData: '/BigBuckBunny.mp4',
         textOverlays: [
-            {text: 'Hello', position: '100,200', startFrame: 0, endFrame: 90},
-            {text: 'World', position: '170,200', startFrame: 0, endFrame: 90},
+            {text: 'Hello', position: '100,200'},
+            {text: 'World', position: '170,200'},
             {text: 'Always Visible', position: '200,400'},
         ]
     });
@@ -202,7 +202,7 @@ export default function Home() {
                     </div>
 
                     {/* Text overlay editor */}
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
                         <TextOverlayEditor
                             initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
                                 id: `overlay-${index}`,
