@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Composition,
     Sequence,
     useVideoConfig,
     Video,
 } from 'remotion';
+import {Resizable} from "re-resizable";
 
 interface TextOverlayProps {
     text: string;
@@ -47,10 +48,22 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
                                                                         videoPosition,
                                                                         textOverlays = [],
                                                                         compositionSize,
-                                                                        videoSize
+                                                                        videoSize,
+                                                                        onVideoResize
                                                                     }) => {
     const {durationInFrames} = useVideoConfig();
     const [videoX, videoY] = videoPosition.split(',').map(Number);
+
+    const [currentVideoSize, setCurrentVideoSize] = useState(videoSize);
+
+    const handleResize = (e, direction, ref, d) => {
+        const newSize = {
+            width: currentVideoSize.width + d.width,
+            height: currentVideoSize.height + d.height
+        };
+        setCurrentVideoSize(newSize);
+        onVideoResize?.(newSize);
+    };
 
     return (
         <div style={{
@@ -61,16 +74,29 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
             height: compositionSize?.height
         }}>
             {videoData && (
-                <Video
-                    src={videoData}
+                <Resizable
+                    size={currentVideoSize}
+                    onResizeStop={handleResize}
+                    minWidth={100}
+                    minHeight={100}
+                    maxWidth={compositionSize.width * 2}
+                    maxHeight={compositionSize.height * 2}
                     style={{
                         position: 'absolute',
                         left: videoX,
                         top: videoY,
-                        width: videoSize?.width,
-                        height: videoSize?.height,
+                        width: currentVideoSize?.width,
+                        height: currentVideoSize?.height,
                     }}
-                />
+                >
+                    <Video
+                        src={videoData}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    />
+                </Resizable>
             )}
 
             {textOverlays.map((overlay, index) => {
@@ -108,7 +134,8 @@ export const RemotionRoot: React.FC = () => {
                     {text: 'Default Text', position: '100,100'}
                 ],
                 videoSize: {width: 1280, height: 720},
-                compositionSize: {width: 1280, height: 720}
+                compositionSize: {width: 1280, height: 720},
+                onVideoResize: () => null,
             }}
         />
     );
