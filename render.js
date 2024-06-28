@@ -88,8 +88,8 @@ const start = async () => {
             composition: {
                 ...composition,
                 durationInFrames,
-                width: inputProps.videoSize.width,
-                height: inputProps.videoSize.height,
+                width: inputProps.compositionSize.width,
+                height: inputProps.compositionSize.height,
             },
             serveUrl: bundleLocation,
             codec: 'h264',

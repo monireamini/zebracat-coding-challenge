@@ -21,8 +21,9 @@ export default function Home() {
     });
     const [isUploading, setIsUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState('');
+    const [compositionSize, setCompositionSize] = useState({width: 1280, height: 720});
     const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
-    const [aspectRatio, setAspectRatio] = useState('16:9');
+    const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
     const [selectedAspectRatio, setSelectedAspectRatio] = useState<string>('16:9');
 
     const handleAspectRatioChange = (newRatio: string) => {
@@ -31,7 +32,7 @@ export default function Home() {
         // Calculate new dimensions based on the selected aspect ratio
         const [width, height] = newRatio.split(':').map(Number);
 
-        setVideoSize(prev => ({width: prev.width, height: Math.floor(prev.width * height / width)}));
+        setCompositionSize(prev => ({width: prev.width, height: Math.floor(prev.width * height / width)}));
     };
 
     const handleExportVideo = async () => {
@@ -45,7 +46,7 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({...inputProps, videoSize}),
+                body: JSON.stringify({...inputProps, compositionSize, videoSize}),
             });
 
             console.log('Response received:', response.status, response.statusText);
@@ -132,7 +133,8 @@ export default function Home() {
                         const height = video.videoHeight;
                         const currentAspectRatio = calculateAspectRatio(width, height)
                         setVideoSize({width, height});
-                        setAspectRatio(currentAspectRatio);
+                        setCompositionSize({width, height})
+                        setVideoAspectRatio(currentAspectRatio);
                         setSelectedAspectRatio(currentAspectRatio);
                     };
                 } else {
@@ -205,7 +207,7 @@ export default function Home() {
                             onChange={(e) => handleAspectRatioChange(e.target.value as string)}
                             className="bg-gray-700 text-white rounded px-2 py-1"
                         >
-                            {(aspectRatios.includes(aspectRatio) ? aspectRatios : [aspectRatio, ...aspectRatios]).map((ratio) => (
+                            {(aspectRatios.includes(videoAspectRatio) ? aspectRatios : [videoAspectRatio, ...aspectRatios]).map((ratio) => (
                                 <option key={ratio} value={ratio}>
                                     {ratio}
                                 </option>
@@ -217,18 +219,18 @@ export default function Home() {
 
             {inputProps.videoData ? (
                 <div className="relative w-full border-2 border-green-500 rounded-[8px]"
-                     style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
+                     style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}>
                     {/* Video player */}
                     <div className="absolute inset-0">
                         <Player
                             component={VideoWithOverlays}
                             durationInFrames={30 * 30}
-                            compositionWidth={videoSize.width}
-                            compositionHeight={videoSize.height}
+                            compositionWidth={compositionSize.width}
+                            compositionHeight={compositionSize.height}
                             fps={30}
                             clickToPlay={false}
                             controls
-                            inputProps={{...inputProps, videoSize, textOverlays: []}}
+                            inputProps={{...inputProps, videoSize, compositionSize, textOverlays: []}}
                             style={{
                                 width: '100%',
                                 height: '100%',
@@ -250,7 +252,7 @@ export default function Home() {
                                 endFrame: overlay.endFrame
                             }))}
                             onOverlaysChange={handleOverlaysChange}
-                            videoSize={videoSize}
+                            compositionSize={compositionSize}
                         />
                     </div>
                 </div>

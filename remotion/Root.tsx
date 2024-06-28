@@ -46,6 +46,7 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
                                                                         videoData,
                                                                         videoPosition,
                                                                         textOverlays = [],
+                                                                        compositionSize,
                                                                         videoSize
                                                                     }) => {
     const {durationInFrames} = useVideoConfig();
@@ -56,8 +57,8 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
             flex: 1,
             backgroundColor: 'black',
             position: 'relative',
-            width: videoSize.width,
-            height: videoSize.height
+            width: compositionSize.width,
+            height: compositionSize.height
         }}>
             {videoData && (
                 <Video
@@ -66,8 +67,8 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
                         position: 'absolute',
                         left: videoX,
                         top: videoY,
-                        width: 320,
-                        height: 180,
+                        width: videoSize.width,
+                        height: videoSize.height,
                     }}
                 />
             )}
@@ -106,7 +107,8 @@ export const RemotionRoot: React.FC = () => {
                 textOverlays: [
                     {text: 'Default Text', position: '100,100'}
                 ],
-                videoSize: {width: 1280, height: 720}
+                videoSize: {width: 1280, height: 720},
+                compositionSize: {width: 1280, height: 720}
             }}
         />
     );

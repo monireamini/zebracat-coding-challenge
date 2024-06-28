@@ -12,10 +12,10 @@ interface TextOverlay {
 interface TextOverlayEditorProps {
     initialOverlays: TextOverlay[];
     onOverlaysChange: (overlays: TextOverlay[]) => void;
-    videoSize: { width: number; height: number };
+    compositionSize: { width: number; height: number };
 }
 
-const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange, videoSize}) => {
+const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange, compositionSize}) => {
     const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
     const [editingId, setEditingId] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -31,8 +31,8 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
                 const containerWidth = containerRef.current.clientWidth;
                 const containerHeight = containerRef.current.clientHeight;
                 setScale({
-                    x: containerWidth / videoSize.width,
-                    y: containerHeight / videoSize.height,
+                    x: containerWidth / compositionSize.width,
+                    y: containerHeight / compositionSize.height,
                 });
             }
         };
@@ -40,7 +40,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
         updateScale();
         window.addEventListener('resize', updateScale);
         return () => window.removeEventListener('resize', updateScale);
-    }, [videoSize]);
+    }, [compositionSize]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const {active, delta} = event;
@@ -50,8 +50,8 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
                     ? {
                         ...overlay,
                         position: {
-                            x: Math.min(Math.max(0, overlay.position.x + delta.x / scale.x), videoSize.width),
-                            y: Math.min(Math.max(0, overlay.position.y + delta.y / scale.y), videoSize.height),
+                            x: Math.min(Math.max(0, overlay.position.x + delta.x / scale.x), compositionSize.width),
+                            y: Math.min(Math.max(0, overlay.position.y + delta.y / scale.y), compositionSize.height),
                         },
                     }
                     : overlay
