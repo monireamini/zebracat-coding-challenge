@@ -19,6 +19,8 @@ export default function Home() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState('');
 
+    const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
+
     const handleExportVideo = async () => {
         setIsExporting(true);
         setExportMessage('Exporting video...');
@@ -109,6 +111,13 @@ export default function Home() {
                         videoData: data.videoUrl
                     }));
                     setUploadMessage('Video uploaded successfully!');
+
+                    // Create a video element to get the dimensions
+                    const video = document.createElement('video');
+                    video.src = data.videoUrl;
+                    video.onloadedmetadata = () => {
+                        setVideoSize({width: video.videoWidth, height: video.videoHeight});
+                    };
                 } else {
                     throw new Error('Failed to upload video');
                 }
@@ -175,33 +184,38 @@ export default function Home() {
             <div className="relative w-full" style={{aspectRatio: '16/9'}}>
                 {/* Video player */}
                 <div className="absolute inset-0">
-                    <Player
-                        component={VideoWithOverlays}
-                        durationInFrames={30 * 30}
-                        compositionWidth={1280}
-                        compositionHeight={720}
-                        fps={30}
-                        clickToPlay={false}
-                        controls
-                        inputProps={inputProps}
-                    />
+                    <div className="absolute inset-0">
+                        <Player
+                            component={VideoWithOverlays}
+                            durationInFrames={30 * 30}
+                            compositionWidth={videoSize.width}
+                            compositionHeight={videoSize.height}
+                            fps={30}
+                            clickToPlay={false}
+                            controls
+                            inputProps={inputProps}
+                        />
+                    </div>
                 </div>
 
                 {/* Text overlay editor */}
                 <div className="absolute inset-0">
-                    <TextOverlayEditor
-                        initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
-                            id: `overlay-${index}`,
-                            text: overlay.text,
-                            position: {
-                                x: parseInt(overlay.position.split(',')[0]),
-                                y: parseInt(overlay.position.split(',')[1])
-                            },
-                            startFrame: overlay.startFrame,
-                            endFrame: overlay.endFrame
-                        }))}
-                        onOverlaysChange={handleOverlaysChange}
-                    />
+                    <div className="absolute inset-0">
+                        <TextOverlayEditor
+                            initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
+                                id: `overlay-${index}`,
+                                text: overlay.text,
+                                position: {
+                                    x: parseInt(overlay.position.split(',')[0]),
+                                    y: parseInt(overlay.position.split(',')[1])
+                                },
+                                startFrame: overlay.startFrame,
+                                endFrame: overlay.endFrame
+                            }))}
+                            onOverlaysChange={handleOverlaysChange}
+                            videoSize={videoSize}
+                        />
+                    </div>
                 </div>
             </div>
         </main>

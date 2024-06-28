@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {DndContext, DragEndEvent, useDraggable, useDroppable} from '@dnd-kit/core';
+import React, { useState, useEffect } from 'react';
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 
 interface TextOverlay {
     id: string;
@@ -12,30 +12,27 @@ interface TextOverlay {
 interface TextOverlayEditorProps {
     initialOverlays: TextOverlay[];
     onOverlaysChange: (overlays: TextOverlay[]) => void;
+    videoSize: { width: number; height: number };
 }
 
-const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange}) => {
+const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, onOverlaysChange, videoSize }) => {
     const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
     const [editingId, setEditingId] = useState<string | null>(null);
-
-    useEffect(() => {
-        setOverlays(initialOverlays);
-    }, [initialOverlays]);
 
     useEffect(() => {
         onOverlaysChange(overlays);
     }, [overlays, onOverlaysChange]);
 
     const handleDragEnd = (event: DragEndEvent) => {
-        const {active, delta} = event;
+        const { active, delta } = event;
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
                 overlay.id === active.id
                     ? {
                         ...overlay,
                         position: {
-                            x: overlay.position.x + delta.x,
-                            y: overlay.position.y + delta.y,
+                            x: Math.min(Math.max(0, overlay.position.x + delta.x), videoSize.width),
+                            y: Math.min(Math.max(0, overlay.position.y + delta.y), videoSize.height),
                         },
                     }
                     : overlay
@@ -46,17 +43,17 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
     const handleTextChange = (id: string, newText: string) => {
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
-                overlay.id === id ? {...overlay, text: newText} : overlay
+                overlay.id === id ? { ...overlay, text: newText } : overlay
             )
         );
     };
 
-    const {setNodeRef} = useDroppable({
+    const { setNodeRef } = useDroppable({
         id: 'editor-area',
     });
 
     return (
-        <div ref={setNodeRef} className="pointer-events-auto w-[1280px] h-[720px]">
+        <div ref={setNodeRef} className="pointer-events-auto" style={{ width: videoSize.width, height: videoSize.height }}>
             <DndContext onDragEnd={handleDragEnd}>
                 {overlays.map((overlay) => (
                     <DraggableOverlay
