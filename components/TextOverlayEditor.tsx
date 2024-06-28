@@ -72,17 +72,8 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
     });
 
     return (
-        <div ref={containerRef} className="w-full h-full relative">
-            <div
-                ref={setNodeRef}
-                className="absolute inset-0 pointer-events-auto"
-                style={{
-                    transform: `scale(${scale.x}, ${scale.y})`,
-                    transformOrigin: 'top left',
-                    width: videoSize.width,
-                    height: videoSize.height
-                }}
-            >
+        <div ref={containerRef} className="w-full h-full">
+            <div ref={setNodeRef} className="pointer-events-auto">
                 <DndContext onDragEnd={handleDragEnd}>
                     {overlays.map((overlay) => (
                         <DraggableOverlay
@@ -124,7 +115,7 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
 
     const style = transform
         ? {
-            transform: `translate3d(${transform.x / scale.x}px, ${transform.y / scale.y}px, 0)`,
+            transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         }
         : undefined;
 
@@ -143,14 +134,12 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
             style={{
                 ...style,
                 position: 'absolute',
-                left: overlay.position.x,
-                top: overlay.position.y,
+                left: overlay.position.x * scale.x,
+                top: overlay.position.y * scale.y,
                 cursor: isEditing ? 'text' : 'move',
-                fontSize: `${24 / scale.x}px`,
+                fontSize: `${24 * scale.x}px`,
                 fontWeight: 'bold',
                 color: '#FFFFFFAA',
-                transform: `scale(${scale.x}, ${scale.y})`,
-                transformOrigin: 'top left',
             }}
             {...attributes}
             {...listeners}
@@ -163,15 +152,11 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                     onChange={handleInputChange}
                     onBlur={onStopEditing}
                     autoFocus
-                    className="bg-transparent border-none outline-none text-white font-bold"
+                    className="bg-transparent border-none outline-none text-white text-2xl font-bold"
                     onClick={(e) => e.stopPropagation()}
                 />
             ) : (
-                <span style={{
-                    color: 'red'
-                }}>
-                    {overlay.text}
-                </span>
+                <span>{overlay.text}</span>
             )}
         </div>
     );
