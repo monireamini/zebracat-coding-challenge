@@ -77,12 +77,6 @@ export default function Home() {
                 </div>
             </div>
 
-            {/*{exportMessage && (*/}
-            {/*    <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>*/}
-            {/*)}*/}
-
-            <h2 className="text-xl font-bold mb-4 text-white self-start">Video Preview and Text Editor</h2>
-
             {/* Video player and overlay editor container */}
             <div className="relative w-full" style={{aspectRatio: '16/9'}}>
                 {/* Video player */}
