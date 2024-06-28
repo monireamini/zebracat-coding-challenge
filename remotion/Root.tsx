@@ -57,8 +57,8 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
             flex: 1,
             backgroundColor: 'black',
             position: 'relative',
-            width: compositionSize.width,
-            height: compositionSize.height
+            width: compositionSize?.width,
+            height: compositionSize?.height
         }}>
             {videoData && (
                 <Video
@@ -67,8 +67,8 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
                         position: 'absolute',
                         left: videoX,
                         top: videoY,
-                        width: videoSize.width,
-                        height: videoSize.height,
+                        width: videoSize?.width,
+                        height: videoSize?.height,
                     }}
                 />
             )}
