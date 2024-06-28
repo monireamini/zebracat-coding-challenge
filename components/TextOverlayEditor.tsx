@@ -56,7 +56,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, o
     });
 
     return (
-        <div ref={setNodeRef} className="w-full h-full pointer-events-auto">
+        <div ref={setNodeRef} className="pointer-events-auto w-[1280px] h-[720px]">
             <DndContext onDragEnd={handleDragEnd}>
                 {overlays.map((overlay) => (
                     <DraggableOverlay

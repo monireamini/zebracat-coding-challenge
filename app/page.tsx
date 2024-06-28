@@ -16,6 +16,8 @@ export default function Home() {
             {text: 'Always Visible', position: '200,400'},
         ]
     });
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadMessage, setUploadMessage] = useState('');
 
     const handleExportVideo = async () => {
         setIsExporting(true);
@@ -85,6 +87,40 @@ export default function Home() {
         }));
     };
 
+    const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setIsUploading(true);
+            setUploadMessage('Uploading video...');
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            try {
+                const response = await fetch('/api/upload-video', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setInputProps(prev => ({
+                        ...prev,
+                        videoData: data.videoUrl
+                    }));
+                    setUploadMessage('Video uploaded successfully!');
+                } else {
+                    throw new Error('Failed to upload video');
+                }
+            } catch (error) {
+                console.error('Error uploading video:', error);
+                setUploadMessage(`Error: ${error.message}`);
+            } finally {
+                setIsUploading(false);
+            }
+        }
+    };
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6">
             <div className="flex flex-row w-full justify-between items-center mb-4">
@@ -103,6 +139,17 @@ export default function Home() {
 
             <div className="flex flex-row w-full justify-between items-center mb-4">
                 <div className="flex flex-row w-full justify-start items-center mb-4">
+                    <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoUpload}
+                        disabled={isUploading}
+                        className="text-white"
+                    />
+                    {/*{uploadMessage && (*/}
+                    {/*    <p className="mt-2 text-sm text-gray-300">{uploadMessage}</p>*/}
+                    {/*)}*/}
+
                     <h1 className="text-lg text-white mr-4">Add New |</h1>
 
                     <div className="flex flex-col items-center">
@@ -119,6 +166,10 @@ export default function Home() {
                     <h1 className="text-lg text-white mr-4">Aspect Ratio | 16:9</h1>
                 </div>
             </div>
+
+            {/*{exportMessage && (*/}
+            {/*    <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>*/}
+            {/*)}*/}
 
             {/* Video player and overlay editor container */}
             <div className="relative w-full" style={{aspectRatio: '16/9'}}>
