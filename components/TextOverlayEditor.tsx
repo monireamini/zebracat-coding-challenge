@@ -101,14 +101,7 @@ interface DraggableOverlayProps {
     scale: { x: number; y: number };
 }
 
-const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
-                                                               overlay,
-                                                               isEditing,
-                                                               onTextChange,
-                                                               onStartEditing,
-                                                               onStopEditing,
-                                                               scale,
-                                                           }) => {
+const DraggableOverlay = ({overlay, isEditing, onTextChange, onStartEditing, onStopEditing, scale}) => {
     const {attributes, listeners, setNodeRef, transform} = useDraggable({
         id: overlay.id,
     });
@@ -119,33 +112,23 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
         }
         : undefined;
 
-    const handleDoubleClick = (e: React.MouseEvent) => {
+    const handleDoubleClick = (e) => {
         e.stopPropagation();
         onStartEditing();
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e) => {
         onTextChange(e.target.value);
     };
 
     return (
         <div
-            ref={setNodeRef}
             className="pointer-events-auto"
             style={{
-                ...style,
                 position: 'absolute',
                 left: overlay.position.x * scale.x,
                 top: overlay.position.y * scale.y,
-                cursor: isEditing ? 'text' : 'move',
-                fontSize: `${24 * scale.x}px`,
-                fontWeight: 'bold',
-                color: 'white',
-                textShadow: '0 0 5px black',
             }}
-            {...attributes}
-            {...listeners}
-            onDoubleClick={handleDoubleClick}
         >
             {isEditing ? (
                 <input
@@ -153,12 +136,26 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                     value={overlay.text}
                     onChange={handleInputChange}
                     onBlur={onStopEditing}
-                    className={`bg-transparent border-2 border-green-500 rounded-[8px] px-2 py-1 outline-none text-white text-[${24 * scale.x}px]`}
+                    className={`bg-transparent border-2 border-green-500 rounded-[4px] px-2 py-1 outline-none text-black text-[${24 * scale.x}px]`}
                     onClick={(e) => e.stopPropagation()}
                     autoFocus
                 />
             ) : (
-                <span>{overlay.text}</span>
+                <div
+                    ref={setNodeRef}
+                    style={{
+                        ...style,
+                        cursor: 'move',
+                        fontSize: `${24 * scale.x}px`,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textShadow: '0 0 5px black',
+                    }}
+                    {...attributes}
+                    {...listeners}
+                >
+                    <span onDoubleClick={handleDoubleClick}>{overlay.text}</span>
+                </div>
             )}
         </div>
     );
