@@ -18,7 +18,50 @@ export default function Home() {
     });
 
     const handleExportVideo = async () => {
-        // ... (export logic remains the same)
+        setIsExporting(true);
+        setExportMessage('Exporting video...');
+
+        try {
+            console.log('Sending export request...');
+            const response = await fetch('/api/export-video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputProps),
+            });
+
+            console.log('Response received:', response.status, response.statusText);
+
+            if (response.ok) {
+                console.log('Response is OK, getting blob...');
+                const blob = await response.blob();
+                console.log('Blob received, size:', blob.size);
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                // @todo: generate a random name for video file
+                a.download = 'exported_video.mp4';
+                document.body.appendChild(a);
+                console.log('Download link created, clicking...');
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                setExportMessage('Video exported successfully! Check your downloads.');
+            } else {
+                console.log('Response not OK, getting error details...');
+                const text = await response.text();
+                console.log('Error details:', text);
+                throw new Error(text || 'Failed to export video');
+            }
+        } catch (error) {
+            console.error('Error in export process:', error);
+            setExportMessage(`Error: ${error.message}`);
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     const handleOverlaysChange = useCallback((newOverlays) => {
@@ -30,6 +73,17 @@ export default function Home() {
             }))
         }));
     }, []);
+
+    const addNewTextOverlay = () => {
+        const newOverlay = {
+            text: 'New Text',
+            position: '50,50',
+        };
+        setInputProps(prev => ({
+            ...prev,
+            textOverlays: [...prev.textOverlays, newOverlay]
+        }));
+    };
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6">
@@ -53,21 +107,10 @@ export default function Home() {
 
                     <div className="flex flex-col items-center">
                         <button
-                            onClick={handleExportVideo}
-                            disabled={isExporting}
+                            onClick={addNewTextOverlay}
                             className="text-white px-4 hover:bg-blue-500 rounded-xl"
                         >
                             Text
-                        </button>
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={handleExportVideo}
-                            disabled={isExporting}
-                            className="text-white px-4 hover:bg-blue-500 rounded-xl"
-                        >
-                            Emoji
                         </button>
                     </div>
                 </div>

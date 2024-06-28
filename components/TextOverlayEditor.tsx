@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
+import React, {useState, useEffect} from 'react';
+import {DndContext, DragEndEvent, useDraggable, useDroppable} from '@dnd-kit/core';
 
 interface TextOverlay {
     id: string;
@@ -14,16 +14,20 @@ interface TextOverlayEditorProps {
     onOverlaysChange: (overlays: TextOverlay[]) => void;
 }
 
-const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, onOverlaysChange }) => {
+const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({initialOverlays, onOverlaysChange}) => {
     const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
     const [editingId, setEditingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        setOverlays(initialOverlays);
+    }, [initialOverlays]);
 
     useEffect(() => {
         onOverlaysChange(overlays);
     }, [overlays, onOverlaysChange]);
 
     const handleDragEnd = (event: DragEndEvent) => {
-        const { active, delta } = event;
+        const {active, delta} = event;
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
                 overlay.id === active.id
@@ -42,21 +46,12 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, 
     const handleTextChange = (id: string, newText: string) => {
         setOverlays((prevOverlays) =>
             prevOverlays.map((overlay) =>
-                overlay.id === id ? { ...overlay, text: newText } : overlay
+                overlay.id === id ? {...overlay, text: newText} : overlay
             )
         );
     };
 
-    const addNewOverlay = () => {
-        const newOverlay: TextOverlay = {
-            id: `overlay-${Date.now()}`,
-            text: 'New Text',
-            position: { x: 50, y: 50 },
-        };
-        setOverlays([...overlays, newOverlay]);
-    };
-
-    const { setNodeRef } = useDroppable({
+    const {setNodeRef} = useDroppable({
         id: 'editor-area',
     });
 
@@ -74,12 +69,6 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, 
                     />
                 ))}
             </DndContext>
-            <button
-                onClick={addNewOverlay}
-                className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
-            >
-                Add Text
-            </button>
         </div>
     );
 };
@@ -99,7 +88,7 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                                                                onStartEditing,
                                                                onStopEditing,
                                                            }) => {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    const {attributes, listeners, setNodeRef, transform} = useDraggable({
         id: overlay.id,
     });
 
