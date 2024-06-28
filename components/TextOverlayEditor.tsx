@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 interface TextOverlay {
     id: string;
@@ -19,6 +17,10 @@ interface TextOverlayEditorProps {
 const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, onOverlaysChange }) => {
     const [overlays, setOverlays] = useState<TextOverlay[]>(initialOverlays);
     const [editingId, setEditingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        onOverlaysChange(overlays);
+    }, [overlays, onOverlaysChange]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, delta } = event;
@@ -53,10 +55,6 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({ initialOverlays, 
         };
         setOverlays([...overlays, newOverlay]);
     };
-
-    React.useEffect(() => {
-        onOverlaysChange(overlays);
-    }, [overlays, onOverlaysChange]);
 
     const { setNodeRef } = useDroppable({
         id: 'editor-area',
@@ -116,6 +114,10 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
         onStartEditing();
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        onTextChange(e.target.value);
+    };
+
     return (
         <div
             ref={setNodeRef}
@@ -132,24 +134,23 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
             }}
             {...attributes}
             {...listeners}
+            onDoubleClick={handleDoubleClick}
         >
             {isEditing ? (
-                <CKEditor
-                    editor={ClassicEditor}
-                    data={overlay.text}
-                    onChange={(event, editor) => {
-                        const data = editor.getData();
-                        onTextChange(data);
+                <input
+                    type="text"
+                    value={overlay.text}
+                    onChange={handleInputChange}
+                    onBlur={onStopEditing}
+                    autoFocus
+                    className="bg-transparent border-none outline-none text-white text-2xl font-bold"
+                    style={{
+                        textShadow: '0 0 5px black',
                     }}
-                    onBlur={(event, editor) => {
-                        onStopEditing();
-                    }}
-                    config={{
-                        toolbar: ['bold', 'italic', 'link'],
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                 />
             ) : (
-                <span onDoubleClick={handleDoubleClick} className="text-white" dangerouslySetInnerHTML={{ __html: overlay.text }}></span>
+                <span>{overlay.text}</span>
             )}
         </div>
     );

@@ -12,7 +12,7 @@ export default function Home() {
         videoData: '/BigBuckBunny.mp4',
         textOverlays: [
             {text: 'Hello', position: '100,200', startFrame: 0, endFrame: 90},
-            {text: 'World', position: '170,200', startFrame: 60, endFrame: 90},
+            {text: 'World', position: '170,200', startFrame: 0, endFrame: 90},
             {text: 'Always Visible', position: '200,400'},
         ]
     });
