@@ -181,9 +181,9 @@ export default function Home() {
             {/*)}*/}
 
             {/* Video player and overlay editor container */}
-            <div className="relative w-full" style={{aspectRatio: '16/9'}}>
-                {/* Video player */}
-                <div className="absolute inset-0">
+            <div className="w-full overflow-hidden" style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
+                <div className="relative w-full h-full">
+                    {/* Video player */}
                     <div className="absolute inset-0">
                         <Player
                             component={VideoWithOverlays}
@@ -194,12 +194,14 @@ export default function Home() {
                             clickToPlay={false}
                             controls
                             inputProps={{...inputProps, videoSize}}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                            }}
                         />
                     </div>
-                </div>
 
-                {/* Text overlay editor */}
-                <div className="absolute inset-0">
+                    {/* Text overlay editor */}
                     <div className="absolute inset-0">
                         <TextOverlayEditor
                             initialOverlays={inputProps.textOverlays.map((overlay, index) => ({
