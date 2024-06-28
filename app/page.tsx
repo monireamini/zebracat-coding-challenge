@@ -193,7 +193,7 @@ export default function Home() {
                             fps={30}
                             clickToPlay={false}
                             controls
-                            inputProps={inputProps}
+                            inputProps={{...inputProps, videoSize}}
                         />
                     </div>
                 </div>

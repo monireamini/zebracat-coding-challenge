@@ -19,6 +19,7 @@ interface Overlay extends TextOverlayProps {
 interface VideoWithOverlaysProps {
     videoData: string;
     textOverlays: Overlay[];
+    videoSize: { width: number; height: number };
 }
 
 const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
@@ -41,11 +42,11 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
     );
 };
 
-export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, textOverlays = [] }) => {
-    const { durationInFrames, width, height } = useVideoConfig();
+export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, textOverlays = [], videoSize }) => {
+    const { durationInFrames } = useVideoConfig();
 
     return (
-        <div style={{flex: 1, backgroundColor: 'black', position: 'relative', width, height}}>
+        <div style={{flex: 1, backgroundColor: 'black', position: 'relative', width: videoSize.width, height: videoSize.height}}>
             <Video src={videoData} />
             {textOverlays.map((overlay, index) => {
                 const startFrame = overlay.startFrame ?? 0;
@@ -79,7 +80,8 @@ export const RemotionRoot: React.FC = () => {
                 videoData: '/BigBuckBunny.mp4',
                 textOverlays: [
                     { text: 'Default Text', position: '100,100' }
-                ]
+                ],
+                videoSize: { width: 1280, height: 720 }
             }}
         />
     );
