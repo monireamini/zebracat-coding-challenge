@@ -153,9 +153,9 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                     value={overlay.text}
                     onChange={handleInputChange}
                     onBlur={onStopEditing}
-                    autoFocus
-                    className="bg-transparent border-none outline-none text-white text-2xl font-bold"
+                    className={`bg-transparent border-2 border-green-500 rounded-[8px] px-2 py-1 outline-none text-white text-[${24 * scale.x}px]`}
                     onClick={(e) => e.stopPropagation()}
+                    autoFocus
                 />
             ) : (
                 <span>{overlay.text}</span>
