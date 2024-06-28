@@ -22,8 +22,13 @@ export async function POST(request: Request) {
         console.log('Cleaning up temp file');
         await fs.unlink('temp-input-props.json');
 
-        // @todo: keep this name consistent everywhere: video.mp4
-        const videoPath = path.resolve(process.cwd(), 'out', 'video.mp4');
+        // Extract the filename from the stdout
+        const outputFileNameMatch = stdout.match(/OUTPUT_FILENAME:(.*\.mp4)/);
+        if (!outputFileNameMatch) {
+            throw new Error('Could not find output filename in script output');
+        }
+        const outputFileName = outputFileNameMatch[1];
+        const videoPath = path.resolve(process.cwd(), 'out', outputFileName);
         console.log('Video path:', videoPath);
 
         console.log('Reading video file');
@@ -33,7 +38,7 @@ export async function POST(request: Request) {
         console.log('Creating response');
         const response = new NextResponse(video);
 
-        response.headers.set('Content-Disposition', `attachment; filename="exported_video.mp4"`);
+        response.headers.set('Content-Disposition', `attachment; filename="${outputFileName}"`);
         response.headers.set('Content-Type', 'video/mp4');
 
         console.log('Sending response');

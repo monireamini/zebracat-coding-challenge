@@ -79,8 +79,11 @@ const start = async () => {
 
         const composition = compositions.find((c) => c.id === compositionId);
 
+        const timestamp = Date.now();
+        const outputFileName = `video_${timestamp}.mp4`;
+        const outputLocation = path.join('out', outputFileName);
+
         console.log('Starting renderMedia...');
-        const outputLocation = 'out/video.mp4';
         await renderMedia({
             composition: {
                 ...composition,
@@ -95,11 +98,15 @@ const start = async () => {
         });
 
         console.log('Render complete');
-        return outputLocation; // Return the path of the generated video
+        console.log(`OUTPUT_FILENAME:${outputFileName}`); // Add this line
+        return outputFileName;
     } catch (error) {
         console.error('Error in render process:', error);
         throw error;
     }
 };
 
-start().catch(console.error);
+start().then((outputFileName) => {
+    console.log('Output filename:', outputFileName);
+    process.stdout.write(outputFileName); // Write the filename to stdout
+}).catch(console.error);
