@@ -1,7 +1,7 @@
 'use client'
 
-import React, {useCallback, useState} from 'react';
-import {Player} from '@remotion/player';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Player, PlayerRef} from '@remotion/player';
 import {VideoWithOverlays} from '../remotion/Root';
 import TextOverlayEditor from '../components/TextOverlayEditor';
 
@@ -151,6 +151,24 @@ export default function Home() {
         return `${width / divisor}:${height / divisor}`;
     }
 
+    const playerRef = useRef<PlayerRef>(null);
+
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const updatePlayingStatus = useCallback(() => {
+        if (playerRef.current) {
+            setIsPlaying(playerRef.current.isPlaying());
+        }
+    }, []);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            updatePlayingStatus();
+        }, 100); // Check every 100ms
+
+        return () => clearInterval(interval);
+    }, [updatePlayingStatus]);
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-center mb-4">
@@ -216,29 +234,37 @@ export default function Home() {
                     {/* Video player */}
                     <div className="absolute inset-0">
                         <Player
+                            ref={playerRef}
                             component={VideoWithOverlays}
                             durationInFrames={30 * 30}
                             compositionWidth={compositionSize.width}
                             compositionHeight={compositionSize.height}
                             fps={30}
                             clickToPlay={false}
-                            controls
-                            inputProps={{...inputProps, videoSize, compositionSize, textOverlays: []}}
+                            inputProps={{
+                                ...inputProps,
+                                videoSize,
+                                compositionSize,
+                                textOverlays: isPlaying ? inputProps.textOverlays : []
+                            }}
                             style={{
                                 width: '100%',
                                 height: '100%',
                             }}
+                            controls
                         />
                     </div>
 
                     {/* Text overlay editor */}
-                    <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
-                        <TextOverlayEditor
-                            overlays={inputProps.textOverlays}
-                            setOverlays={handleSetOverlays}
-                            compositionSize={compositionSize}
-                        />
-                    </div>
+                    {!isPlaying && (
+                        <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
+                            <TextOverlayEditor
+                                overlays={inputProps.textOverlays}
+                                setOverlays={handleSetOverlays}
+                                compositionSize={compositionSize}
+                            />
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="w-full h-64 flex items-center justify-center bg-gray-800 text-white text-xl">

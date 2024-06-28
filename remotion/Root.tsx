@@ -4,6 +4,8 @@ import {
     Sequence,
     useVideoConfig,
     Video,
+    useCurrentFrame,
+    spring,
 } from 'remotion';
 
 interface TextOverlayProps {
@@ -22,8 +24,24 @@ interface VideoWithOverlaysProps {
     videoSize: { width: number; height: number };
 }
 
-const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
+const TextOverlay: React.FC<TextOverlayProps> = ({ text, position, animationDuration = 30 }) => {
+    const frame = useCurrentFrame();
+    const { fps } = useVideoConfig();
     const [x, y] = position.split(',').map(Number);
+
+    const characters = text.split('');
+    const revealProgress = spring({
+        frame,
+        fps,
+        config: {
+            damping: 100,
+            stiffness: 200,
+            mass: 0.5,
+        },
+        durationInFrames: animationDuration,
+    });
+
+    const charactersToShow = Math.floor(characters.length * revealProgress);
 
     return (
         <div
@@ -37,7 +55,17 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
                 textShadow: '0 0 5px black',
             }}
         >
-            {text}
+            {characters.map((char, index) => (
+                <span
+                    key={index}
+                    style={{
+                        opacity: index < charactersToShow ? 1 : 0,
+                        transition: 'opacity 0.1s ease-in-out',
+                    }}
+                >
+                    {char}
+                </span>
+            ))}
         </div>
     );
 };
