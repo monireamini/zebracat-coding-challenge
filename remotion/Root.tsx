@@ -42,22 +42,35 @@ const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
     );
 };
 
-export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({ videoData, videoPosition, textOverlays = [], videoSize }) => {
-    const { durationInFrames } = useVideoConfig();
+export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
+                                                                        videoData,
+                                                                        videoPosition,
+                                                                        textOverlays = [],
+                                                                        videoSize
+                                                                    }) => {
+    const {durationInFrames} = useVideoConfig();
     const [videoX, videoY] = videoPosition.split(',').map(Number);
 
     return (
-        <div style={{flex: 1, backgroundColor: 'black', position: 'relative', width: videoSize.width, height: videoSize.height}}>
-            <Video
-                src={videoData}
-                style={{
-                    position: 'absolute',
-                    left: videoX,
-                    top: videoY,
-                    width: 320,
-                    height: 180,
-                }}
-            />
+        <div style={{
+            flex: 1,
+            backgroundColor: 'black',
+            position: 'relative',
+            width: videoSize.width,
+            height: videoSize.height
+        }}>
+            {videoData && (
+                <Video
+                    src={videoData}
+                    style={{
+                        position: 'absolute',
+                        left: videoX,
+                        top: videoY,
+                        width: 320,
+                        height: 180,
+                    }}
+                />
+            )}
 
             {textOverlays.map((overlay, index) => {
                 const startFrame = overlay.startFrame ?? 0;
@@ -91,9 +104,9 @@ export const RemotionRoot: React.FC = () => {
                 videoData: '/BigBuckBunny.mp4',
                 videoPosition: '0,0',
                 textOverlays: [
-                    { text: 'Default Text', position: '100,100' }
+                    {text: 'Default Text', position: '100,100'}
                 ],
-                videoSize: { width: 1280, height: 720 }
+                videoSize: {width: 1280, height: 720}
             }}
         />
     );
