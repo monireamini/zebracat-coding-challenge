@@ -9,7 +9,7 @@ export default function Home() {
     const [isExporting, setIsExporting] = useState(false);
     const [exportMessage, setExportMessage] = useState('');
     const [inputProps, setInputProps] = useState({
-        videoData: '/BigBuckBunny.mp4',
+        videoData: '',
         textOverlays: [
             {text: 'Hello', position: '100,200'},
             {text: 'World', position: '170,200'},
@@ -18,7 +18,6 @@ export default function Home() {
     });
     const [isUploading, setIsUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState('');
-
     const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
 
     const handleExportVideo = async () => {
@@ -131,18 +130,21 @@ export default function Home() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-start p-6">
+        <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-white">Video Generator</h1>
 
                 <div className="flex flex-col items-center">
                     <button
                         onClick={handleExportVideo}
-                        disabled={isExporting}
+                        disabled={isExporting || !inputProps.videoData}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                     >
                         {isExporting ? 'Exporting...' : 'Export'}
                     </button>
+                    {/*{exportMessage && (*/}
+                    {/*    <p className="mt-2 text-sm text-gray-300">{exportMessage}</p>*/}
+                    {/*)}*/}
                 </div>
             </div>
 
@@ -171,18 +173,15 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className="flex flex-row w-full justify-start items-center mb-4">
-                    <h1 className="text-lg text-white mr-4">Aspect Ratio | 16:9</h1>
-                </div>
+                {inputProps.videoData && (
+                    <div className="flex flex-row w-full justify-start items-center mb-4">
+                        <h1 className="text-lg text-white mr-4">Aspect Ratio | {videoSize.width}:{videoSize.height}</h1>
+                    </div>
+                )}
             </div>
 
-            {/*{exportMessage && (*/}
-            {/*    <p className="mt-4 text-sm text-gray-300 mb-4">{exportMessage}</p>*/}
-            {/*)}*/}
-
-            {/* Video player and overlay editor container */}
-            <div className="w-full overflow-hidden" style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
-                <div className="relative w-full h-full">
+            {inputProps.videoData ? (
+                <div className="relative w-full" style={{aspectRatio: `${videoSize.width} / ${videoSize.height}`}}>
                     {/* Video player */}
                     <div className="absolute inset-0">
                         <Player
@@ -219,7 +218,11 @@ export default function Home() {
                         />
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="w-full h-64 flex items-center justify-center bg-gray-800 text-white text-xl">
+                    Please upload a video to start editing
+                </div>
+            )}
         </main>
     )
 }
