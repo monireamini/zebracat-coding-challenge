@@ -74,7 +74,7 @@ const start = async () => {
         console.log('Duration in frames:', durationInFrames);
 
         const compositions = await getCompositions(bundleLocation, {
-            inputProps: { ...inputProps, videoData },
+            inputProps: {...inputProps, videoData},
         });
 
         const composition = compositions.find((c) => c.id === compositionId);
@@ -85,11 +85,13 @@ const start = async () => {
             composition: {
                 ...composition,
                 durationInFrames,
+                width: inputProps.videoSize.width,
+                height: inputProps.videoSize.height,
             },
             serveUrl: bundleLocation,
             codec: 'h264',
             outputLocation,
-            inputProps: { ...inputProps, videoData },
+            inputProps: {...inputProps, videoData},
         });
 
         console.log('Render complete');

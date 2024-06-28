@@ -115,8 +115,7 @@ const DraggableOverlay: React.FC<DraggableOverlayProps> = ({
                 cursor: isEditing ? 'text' : 'move',
                 fontSize: '24px',
                 fontWeight: 'bold',
-                color: 'white',
-                textShadow: '0 0 5px black',
+                color: '#FFFFFFAA',
             }}
             {...attributes}
             {...listeners}

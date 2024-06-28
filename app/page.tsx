@@ -32,7 +32,7 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(inputProps),
+                body: JSON.stringify({...inputProps, videoSize}),
             });
 
             console.log('Response received:', response.status, response.statusText);
