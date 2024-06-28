@@ -5,6 +5,8 @@ import {Player} from '@remotion/player';
 import {VideoWithOverlays} from '../remotion/Root';
 import TextOverlayEditor from '../components/TextOverlayEditor';
 
+const aspectRatios: string[] = ['16:9', '4:3', '1:1', '3:4', '9:16'];
+
 export default function Home() {
     const [isExporting, setIsExporting] = useState(false);
     const [exportMessage, setExportMessage] = useState('');
@@ -20,6 +22,16 @@ export default function Home() {
     const [uploadMessage, setUploadMessage] = useState('');
     const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
     const [aspectRatio, setAspectRatio] = useState('16:9');
+    const [selectedAspectRatio, setSelectedAspectRatio] = useState<string>('16:9');
+
+    const handleAspectRatioChange = (newRatio: string) => {
+        setSelectedAspectRatio(newRatio);
+
+        // Calculate new dimensions based on the selected aspect ratio
+        const [width, height] = newRatio.split(':').map(Number);
+
+        setVideoSize(prev => ({width: prev.width, height: Math.floor(prev.width * height / width)}));
+    };
 
     const handleExportVideo = async () => {
         setIsExporting(true);
@@ -46,7 +58,6 @@ export default function Home() {
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                // @todo: generate a random name for video file
                 a.download = 'exported_video.mp4';
                 document.body.appendChild(a);
                 console.log('Download link created, clicking...');
@@ -118,8 +129,10 @@ export default function Home() {
                     video.onloadedmetadata = () => {
                         const width = video.videoWidth;
                         const height = video.videoHeight;
+                        const currentAspectRatio = calculateAspectRatio(width, height)
                         setVideoSize({width, height});
-                        setAspectRatio(calculateAspectRatio(width, height));
+                        setAspectRatio(currentAspectRatio);
+                        setSelectedAspectRatio(currentAspectRatio);
                     };
                 } else {
                     throw new Error('Failed to upload video');
@@ -184,10 +197,19 @@ export default function Home() {
                 </div>
 
                 {inputProps.videoData && (
-                    <div className="flex flex-row w-full justify-start items-center mb-4">
-                        <h1 className="text-lg text-white mr-4">
-                            Aspect Ratio | {aspectRatio}
-                        </h1>
+                    <div className="flex flex-row w-full justify-end items-center mb-4">
+                        <h1 className="text-lg text-white mr-4">Aspect Ratio</h1>
+                        <select
+                            value={selectedAspectRatio}
+                            onChange={(e) => handleAspectRatioChange(e.target.value as string)}
+                            className="bg-gray-700 text-white rounded px-2 py-1"
+                        >
+                            {(aspectRatios.includes(aspectRatio) ? aspectRatios : [aspectRatio, ...aspectRatios]).map((ratio) => (
+                                <option key={ratio} value={ratio}>
+                                    {ratio}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 )}
             </div>
