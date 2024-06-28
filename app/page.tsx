@@ -193,7 +193,7 @@ export default function Home() {
                             fps={30}
                             clickToPlay={false}
                             controls
-                            inputProps={{...inputProps, videoSize}}
+                            inputProps={{...inputProps, videoSize, textOverlays: []}}
                             style={{
                                 width: '100%',
                                 height: '100%',
