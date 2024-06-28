@@ -19,6 +19,7 @@ export default function Home() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState('');
     const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
+    const [aspectRatio, setAspectRatio] = useState('16:9');
 
     const handleExportVideo = async () => {
         setIsExporting(true);
@@ -115,7 +116,10 @@ export default function Home() {
                     const video = document.createElement('video');
                     video.src = data.videoUrl;
                     video.onloadedmetadata = () => {
-                        setVideoSize({width: video.videoWidth, height: video.videoHeight});
+                        const width = video.videoWidth;
+                        const height = video.videoHeight;
+                        setVideoSize({width, height});
+                        setAspectRatio(calculateAspectRatio(width, height));
                     };
                 } else {
                     throw new Error('Failed to upload video');
@@ -128,6 +132,12 @@ export default function Home() {
             }
         }
     };
+
+    function calculateAspectRatio(width: number, height: number): string {
+        const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+        const divisor = gcd(width, height);
+        return `${width / divisor}:${height / divisor}`;
+    }
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
@@ -175,7 +185,9 @@ export default function Home() {
 
                 {inputProps.videoData && (
                     <div className="flex flex-row w-full justify-start items-center mb-4">
-                        <h1 className="text-lg text-white mr-4">Aspect Ratio | {videoSize.width}:{videoSize.height}</h1>
+                        <h1 className="text-lg text-white mr-4">
+                            Aspect Ratio | {aspectRatio}
+                        </h1>
                     </div>
                 )}
             </div>
