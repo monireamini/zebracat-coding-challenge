@@ -5,10 +5,12 @@ import {
     useVideoConfig,
     Video,
     useCurrentFrame,
+    spring,
+    interpolate,
 } from 'remotion';
 import { loadFont } from '@remotion/google-fonts/Roboto';
 
-const {fontFamily} = loadFont();
+const { fontFamily } = loadFont();
 
 interface TextOverlayProps {
     text: string;
@@ -26,14 +28,13 @@ interface VideoWithOverlaysProps {
     videoSize: { width: number; height: number };
 }
 
-const TextOverlay: React.FC<TextOverlayProps> = ({ text, position, animationDuration = 30 }) => {
+const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
     const [x, y] = position.split(',').map(Number);
 
-    const characters = text.split('');
-    const progress = Math.min(frame / animationDuration, 1);
-    const charactersToShow = Math.floor(characters.length * progress);
+    const words = text.split(' ');
+    const loopDuration = 60
 
     return (
         <div
@@ -46,19 +47,37 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position, animationDura
                 fontWeight: 'bold',
                 color: 'white',
                 textShadow: '0 0 5px black',
+                display: 'flex',
+                flexWrap: 'wrap',
             }}
         >
-            {characters.map((char, index) => (
-                <span
-                    key={index}
-                    style={{
-                        opacity: index < charactersToShow ? 1 : 0,
-                        transition: 'opacity 0.1s ease-in-out',
-                    }}
-                >
-                    {char}
-                </span>
-            ))}
+            {words.map((word, i) => {
+                const delay = i * 5;
+                const loopFrame = frame % loopDuration;
+                const animatedOpacity = spring({
+                    fps,
+                    frame: loopFrame - delay,
+                    config: {
+                        damping: 200,
+                    },
+                    durationInFrames: loopDuration - 10, // Leave some frames for reset
+                });
+
+                const animatedY = interpolate(animatedOpacity, [0, 1], [20, 0]);
+
+                return (
+                    <span
+                        key={i}
+                        style={{
+                            opacity: animatedOpacity,
+                            transform: `translateY(${animatedY}px)`,
+                            marginRight: '0.3em',
+                        }}
+                    >
+                        {word}
+                    </span>
+                );
+            })}
         </div>
     );
 };
