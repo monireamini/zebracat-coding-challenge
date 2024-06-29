@@ -5,7 +5,6 @@ import {
     useVideoConfig,
     Video,
     useCurrentFrame,
-    spring,
 } from 'remotion';
 import { loadFont } from '@remotion/google-fonts/Roboto';
 
@@ -33,18 +32,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position, animationDura
     const [x, y] = position.split(',').map(Number);
 
     const characters = text.split('');
-    const revealProgress = spring({
-        frame,
-        fps,
-        config: {
-            damping: 100,
-            stiffness: 200,
-            mass: 0.5,
-        },
-        durationInFrames: animationDuration,
-    });
-
-    const charactersToShow = Math.floor(characters.length * revealProgress);
+    const progress = Math.min(frame / animationDuration, 1);
+    const charactersToShow = Math.floor(characters.length * progress);
 
     return (
         <div
