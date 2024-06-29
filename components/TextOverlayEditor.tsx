@@ -135,7 +135,7 @@ const DraggableOverlay = ({overlay, isEditing, onTextChange, onStartEditing, onS
                     value={overlay.text}
                     onChange={handleInputChange}
                     onBlur={onStopEditing}
-                    className={`bg-transparent border-2 border-green-500 rounded-[4px] px-2 py-1 outline-none text-black text-[${24 * scale.x}px]`}
+                    className={`border-2 border-green-500 rounded-[8px] px-2 py-1 outline-none text-white bg-[#22222266] font-bold text-[${24 * scale.x}px]`}
                     onClick={(e) => e.stopPropagation()}
                     autoFocus
                 />
