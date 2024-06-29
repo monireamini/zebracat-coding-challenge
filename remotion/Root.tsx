@@ -107,13 +107,10 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
     const [videoX, videoY] = videoPosition.split(',').map(Number);
 
     return (
-        <div style={{
-            flex: 1,
-            backgroundColor: 'black',
-            position: 'relative',
-            width: compositionSize?.width,
-            height: compositionSize?.height
-        }}>
+        <div
+            style={{width: compositionSize?.width, height: compositionSize?.height}}
+            className="bg-white relative flex"
+        >
             <style>
                 {`
                     @font-face {

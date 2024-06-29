@@ -277,52 +277,42 @@ export default function Home() {
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
-            <div className="flex flex-row w-full justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-white">Video Generator</h1>
-
-                <div className="flex flex-col items-center">
-                    <button
-                        onClick={handleExportVideo}
-                        disabled={isExporting || !inputProps.videoData}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                    >
-                        {isExporting ? 'Exporting...' : 'Export'}
-                    </button>
-                    {/*{exportMessage && (*/}
-                    {/*    <p className="mt-2 text-sm text-gray-300">{exportMessage}</p>*/}
-                    {/*)}*/}
-                </div>
+            <div className="flex flex-row w-full justify-between items-start mb-4">
+                <h1 className="text-xl font-semibold">Video Editing Environment</h1>
+                <button
+                    onClick={handleExportVideo}
+                    disabled={isExporting || !inputProps.videoData}
+                    className="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                >
+                    {isExporting ? 'Exporting...' : 'Export Video'}
+                </button>
             </div>
 
-            <div className="flex flex-row w-full justify-between items-center mb-4">
-                <div className="flex flex-row w-full justify-start items-center mb-4">
-                    <input
-                        type="file"
-                        accept="video/*"
-                        onChange={handleVideoUpload}
-                        disabled={isUploading}
-                        className="text-white"
-                    />
-                    {/*{uploadMessage && (*/}
-                    {/*    <p className="mt-2 text-sm text-gray-300">{uploadMessage}</p>*/}
-                    {/*)}*/}
+            <p className="self-start mb-2 text-lg">Select a video to enhance with dynamic text overlays!</p>
 
-                    <button
-                        onClick={addNewTextOverlay}
-                        disabled={!inputProps.videoData}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                    >
-                        Add Text
-                    </button>
-                </div>
+            <div className="flex flex-row w-full justify-between items-center mb-4">
+                <input
+                    id="video-upload"
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    disabled={isUploading}
+                />
 
                 {inputProps.videoData && (
-                    <div className="flex flex-row w-full justify-end items-center mb-4">
-                        <h1 className="text-lg text-white mr-4">Aspect Ratio</h1>
+                    <div>
+                        <button
+                            onClick={addNewTextOverlay}
+                            disabled={!inputProps.videoData}
+                            className="mr-4 bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                        >
+                            Add Text
+                        </button>
+
                         <select
                             value={selectedAspectRatio}
                             onChange={(e) => handleAspectRatioChange(e.target.value as string)}
-                            className="bg-gray-700 text-white rounded px-2 py-1"
+                            className="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                         >
                             {(aspectRatios.includes(videoAspectRatio) ? aspectRatios : [videoAspectRatio, ...aspectRatios]).map((ratio) => (
                                 <option key={ratio} value={ratio}>
@@ -335,45 +325,45 @@ export default function Home() {
             </div>
 
             {inputProps.videoData && (
-                <div className="mb-4 grid grid-cols-4 gap-4">
-                    <div>
-                        <label htmlFor="videoWidth" className="block text-white">Video Width:</label>
+                <div className="mb-4 w-full flex flex-row justify-start items-center">
+                    <div className="mr-2">
+                        <label htmlFor="videoWidth" className="block text-sm">Width</label>
                         <input
                             id="videoWidth"
                             type="number"
                             value={videoSize.width}
                             onChange={(e) => handleVideoSizeChange(e, 'width')}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
                         />
                     </div>
-                    <div>
-                        <label htmlFor="videoHeight" className="block text-white">Video Height:</label>
+                    <div className="mr-4">
+                        <label htmlFor="videoHeight" className="block text-sm">Height</label>
                         <input
                             id="videoHeight"
                             type="number"
                             value={videoSize.height}
                             onChange={(e) => handleVideoSizeChange(e, 'height')}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
                         />
                     </div>
-                    <div>
-                        <label htmlFor="videoPositionX" className="block text-white">Video Position X:</label>
+                    <div className="mr-2">
+                        <label htmlFor="videoPositionX" className="block text-sm">Position X</label>
                         <input
                             id="videoPositionX"
                             type="number"
                             value={inputProps.videoPosition.split(',')[0]}
                             onChange={(e) => handleVideoPositionChange(e, 'x')}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
                         />
                     </div>
                     <div>
-                        <label htmlFor="videoPositionY" className="block text-white">Video Position Y:</label>
+                        <label htmlFor="videoPositionY" className="block text-sm">Position Y</label>
                         <input
                             id="videoPositionY"
                             type="number"
                             value={inputProps.videoPosition.split(',')[1]}
                             onChange={(e) => handleVideoPositionChange(e, 'y')}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
                         />
                     </div>
                 </div>
@@ -423,7 +413,7 @@ export default function Home() {
                         >
                             {/* Resize handle */}
                             <div
-                                className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-[-6px] right-[-6px]"
+                                className="absolute bg-blue-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-0 right-0"
                                 onMouseDown={handleResizeStart}
                             />
                         </div>
@@ -442,8 +432,11 @@ export default function Home() {
                     )}
                 </div>
             ) : (
-                <div className="w-full h-64 flex items-center justify-center bg-gray-800 text-white text-xl">
-                    Please upload a video to start editing
+                <div
+                    className="w-full p-16 mt-4 flex items-center justify-center border-2 border-mediumGray rounded-2xl text-xl text-mediumGray"
+                    onClick={() => document.getElementById('video-upload').click()}
+                >
+                    + upload a video to start editing
                 </div>
             )}
         </main>
