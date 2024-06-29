@@ -13,33 +13,16 @@ interface TextOverlayEditorProps {
     overlays: TextOverlay[];
     setOverlays: (overlays: TextOverlay[]) => void;
     compositionSize: { width: number; height: number };
+    scale: number
 }
 
 const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({
                                                                  overlays,
                                                                  setOverlays,
-                                                                 compositionSize
+                                                                 compositionSize,
+                                                                 scale
                                                              }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [scale, setScale] = useState({x: 1, y: 1});
-
-    useEffect(() => {
-        const updateScale = () => {
-            if (containerRef.current) {
-                const containerWidth = containerRef.current.clientWidth;
-                const containerHeight = containerRef.current.clientHeight;
-                setScale({
-                    x: containerWidth / compositionSize.width,
-                    y: containerHeight / compositionSize.height,
-                });
-            }
-        };
-
-        updateScale();
-        window.addEventListener('resize', updateScale);
-        return () => window.removeEventListener('resize', updateScale);
-    }, [compositionSize]);
 
     const handleDragEnd = (event: DragEndEvent) => {
         const {active, delta} = event;
@@ -68,7 +51,7 @@ const TextOverlayEditor: React.FC<TextOverlayEditorProps> = ({
     });
 
     return (
-        <div ref={containerRef} className="w-full h-full pointer-events-none">
+        <div className="w-full h-full pointer-events-none">
             <div ref={setNodeRef} className="pointer-events-auto">
                 <DndContext onDragEnd={handleDragEnd}>
                     {overlays?.map((overlay) => (

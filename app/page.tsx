@@ -29,6 +29,27 @@ export default function Home() {
     const [dragStart, setDragStart] = useState({x: 0, y: 0});
     const videoContainerRef = useRef(null);
 
+    const [scale, setScale] = useState({x: 1, y: 1});
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const updateScale = () => {
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.clientWidth;
+                const containerHeight = containerRef.current.clientHeight;
+                setScale({
+                    x: containerWidth / compositionSize.width,
+                    y: containerHeight / compositionSize.height,
+                });
+            }
+        };
+
+        updateScale();
+        window.addEventListener('resize', updateScale);
+        return () => window.removeEventListener('resize', updateScale);
+    }, [compositionSize]);
+
+
     const handleMouseDown = (e) => {
         if (e.target === videoContainerRef.current) {
             setIsDragging(true);
@@ -50,7 +71,7 @@ export default function Home() {
             }));
         } else if (isResizing) {
             const newWidth = Math.max(e.clientX - dragStart.x, 20); // Minimum width of 20px
-            const newHeight = Math.max(e.clientY - dragStart.y, 20); // Minimum height of 20px
+            const newHeight = Math.max((e.clientX - dragStart.x) * (videoSize.height / videoSize.width), 20); // Minimum height of 20px
             setVideoSize({width: newWidth, height: newHeight});
         }
     }, [isDragging, isResizing, dragStart]);
@@ -90,7 +111,6 @@ export default function Home() {
         setExportMessage('Exporting video...');
 
         try {
-            console.log('Sending export request...');
             const response = await fetch('/api/export-video', {
                 method: 'POST',
                 headers: {
@@ -99,32 +119,23 @@ export default function Home() {
                 body: JSON.stringify({...inputProps, compositionSize, videoSize}),
             });
 
-            console.log('Response received:', response.status, response.statusText);
-
             if (response.ok) {
-                console.log('Response is OK, getting blob...');
                 const blob = await response.blob();
-                console.log('Blob received, size:', blob.size);
-
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
                 a.download = 'exported_video.mp4';
                 document.body.appendChild(a);
-                console.log('Download link created, clicking...');
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
                 setExportMessage('Video exported successfully! Check your downloads.');
             } else {
-                console.log('Response not OK, getting error details...');
                 const text = await response.text();
-                console.log('Error details:', text);
                 throw new Error(text || 'Failed to export video');
             }
         } catch (error) {
-            console.error('Error in export process:', error);
             setExportMessage(`Error: ${error.message}`);
         } finally {
             setIsExporting(false);
@@ -189,7 +200,6 @@ export default function Home() {
                     throw new Error('Failed to upload video');
                 }
             } catch (error) {
-                console.error('Error uploading video:', error);
                 setUploadMessage(`Error: ${error.message}`);
             } finally {
                 setIsUploading(false);
@@ -363,37 +373,11 @@ export default function Home() {
             )}
 
             {inputProps.videoData ? (
-                <div className="relative w-full border-2 border-green-500 rounded-[8px]"
-                     style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}
+                <div
+                    ref={containerRef}
+                    className="relative w-full border-2 border-green-500 rounded-[8px]"
+                    style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}
                 >
-                    {/* Video container */}
-                    <div
-                        ref={videoContainerRef}
-                        className="absolute"
-                        style={{
-                            width: `${videoSize.width}px`,
-                            height: `${videoSize.height}px`,
-                            left: inputProps.videoPosition.split(',')[0] + 'px',
-                            top: inputProps.videoPosition.split(',')[1] + 'px',
-                            cursor: isDragging ? 'grabbing' : 'grab'
-                        }}
-                        onMouseDown={handleMouseDown}
-                    >
-                        {/* Resize handle */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                right: '-5px',
-                                bottom: '-5px',
-                                width: '10px',
-                                height: '10px',
-                                background: 'white',
-                                cursor: 'nwse-resize'
-                            }}
-                            onMouseDown={handleResizeStart}
-                        />
-                    </div>
-
                     {/* Player component */}
                     <Player
                         ref={playerRef}
@@ -416,6 +400,39 @@ export default function Home() {
                         controls
                     />
 
+                    {/* Video container */}
+                    {!isPlaying && (
+                        <div
+                            ref={videoContainerRef}
+                            className="absolute"
+                            style={{
+                                width: `${videoSize.width * scale.x}px`,
+                                height: `${videoSize.height * scale.y}px`,
+                                left: parseInt(inputProps.videoPosition.split(',')[0]) * scale.x + 'px',
+                                top: parseInt(inputProps.videoPosition.split(',')[1]) * scale.y + 'px',
+                                cursor: isDragging ? 'grabbing' : 'move',
+                            }}
+                            onMouseDown={handleMouseDown}
+                        >
+                            {/* Resize handle */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: '-5px',
+                                    right: '-5px',
+                                    width: '10px',
+                                    height: '10px',
+                                    borderRadius: '50%',
+                                    borderWidth: '2px',
+                                    borderColor: 'white',
+                                    backgroundColor: "green",
+                                    cursor: 'nesw-resize'
+                                }}
+                                onMouseDown={handleResizeStart}
+                            />
+                        </div>
+                    )}
+
                     {/* Text overlay editor */}
                     {!isPlaying && (
                         <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
@@ -423,6 +440,7 @@ export default function Home() {
                                 overlays={inputProps.textOverlays}
                                 setOverlays={handleSetOverlays}
                                 compositionSize={compositionSize}
+                                scale={scale}
                             />
                         </div>
                     )}
