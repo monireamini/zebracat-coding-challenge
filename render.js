@@ -1,3 +1,40 @@
+/**
+ * Video Composition Render Script
+ *
+ * This script is responsible for rendering a video composition based on input properties.
+ * It's typically executed by the export-video server-side API.
+ *
+ * Key functionalities:
+ * 1. Reads input properties from a temporary file
+ * 2. Bundles the Remotion composition
+ * 3. Retrieves video metadata (duration, dimensions)
+ * 4. Renders the composition with text overlays
+ * 5. Outputs the rendered video to the 'out' directory
+ *
+ * Input properties include:
+ * - videoData: Base64 encoded video content
+ * - videoPosition: Position of the video within the composition
+ * - compositionSize: Dimensions of the entire composition
+ * - textOverlays: Array of text overlay data (text, position)
+ *
+ * Process:
+ * 1. Bundle the Remotion composition
+ * 2. Read and process the input video file
+ * 3. Calculate video duration and frame count
+ * 4. Render the composition using Remotion's renderMedia
+ * 5. Save the output video with a timestamp-based filename
+ *
+ * Output:
+ * - Rendered video file in the 'out' directory
+ * - Filename of the rendered video (written to stdout for further processing)
+ *
+ * Usage:
+ * This script is executed by the server, and the resulting filename
+ * is used to facilitate video download on the client side.
+ *
+ * Note: Ensure all necessary dependencies are installed and paths are correctly set.
+ */
+
 const {bundle} = require('@remotion/bundler');
 const {getCompositions, renderMedia} = require('@remotion/renderer');
 const ffprobe = require('ffprobe-static');
