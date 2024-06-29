@@ -2,8 +2,8 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Player, PlayerRef} from '@remotion/player';
-import {VideoWithOverlays} from '../remotion/Root';
 import TextOverlayEditor from '../components/TextOverlayEditor';
+import {VideoWithOverlays} from "../remotion/VideoWithOverlays";
 
 const aspectRatios: string[] = ['16:9', '4:3', '1:1', '3:4', '9:16'];
 
