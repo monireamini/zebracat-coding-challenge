@@ -170,6 +170,7 @@ export default function Home() {
 
     const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        setSelectedFile(file?.name)
         if (file) {
             setIsUploading(true);
             setUploadMessage('Uploading video...');
@@ -274,6 +275,8 @@ export default function Home() {
         }
     };
 
+    const [selectedFile, setSelectedFile] = useState("No file chosen");
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-start mb-4">
@@ -287,16 +290,33 @@ export default function Home() {
                 </button>
             </div>
 
-            <p className="self-start mb-2 text-lg">Select a video to enhance with dynamic text overlays!</p>
+            <p className="self-start mb-3 text-lg">Select a video to enhance with dynamic text overlays!</p>
 
             <div className="flex flex-row w-full justify-between items-center mb-4">
-                <input
-                    id="video-upload"
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoUpload}
-                    disabled={isUploading}
-                />
+                <div className="flex flex-row justify-start items-center">
+                    <input
+                        id="video-upload"
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoUpload}
+                        disabled={isUploading}
+                        className="block w-full text-sm text-foreground
+                    file:mr-4 file:py-2 file:px-4 file:rounded-md
+                    file:border-0 file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-pink-100 hidden"
+                    />
+                    <label
+                        htmlFor="video-upload"
+                        className="block mr-4 py-2 px-4
+                    rounded-md border-0 bg-blue-50
+                    text-blue-700 hover:bg-blue-100 cursor-pointer"
+                    >
+                        Select a video
+                    </label>
+                    <label className="text-sm text-slate-500">{selectedFile}</label>
+                </div>
+
 
                 {inputProps.videoData && (
                     <div>

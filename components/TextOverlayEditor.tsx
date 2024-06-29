@@ -5,8 +5,6 @@ interface TextOverlay {
     id: string;
     text: string;
     position: { x: number; y: number };
-    startFrame?: number;
-    endFrame?: number;
 }
 
 interface TextOverlayEditorProps {

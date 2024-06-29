@@ -1,12 +1,15 @@
 import React from 'react';
 import {
     Composition,
+    continueRender,
+    delayRender,
+    interpolate,
     Sequence,
+    spring,
+    staticFile,
+    useCurrentFrame,
     useVideoConfig,
     Video,
-    useCurrentFrame,
-    spring,
-    interpolate, staticFile, delayRender, continueRender,
 } from 'remotion';
 
 const fontFamily = 'Poppins';
@@ -27,14 +30,9 @@ interface TextOverlayProps {
     position: string;
 }
 
-interface Overlay extends TextOverlayProps {
-    startFrame?: number;
-    endFrame?: number;
-}
-
 interface VideoWithOverlaysProps {
     videoData: string;
-    textOverlays: Overlay[];
+    textOverlays: TextOverlayProps[];
     videoSize: { width: number; height: number };
 }
 
@@ -136,15 +134,10 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
             )}
 
             {textOverlays.map((overlay, index) => {
-                const startFrame = overlay.startFrame ?? 0;
-                const endFrame = overlay.endFrame ?? durationInFrames;
-                const overlayDuration = endFrame - startFrame;
-
                 return (
                     <Sequence
                         key={index}
-                        from={startFrame}
-                        durationInFrames={overlayDuration}
+                        durationInFrames={durationInFrames}
                     >
                         <TextOverlay text={overlay.text} position={overlay.position}/>
                     </Sequence>
