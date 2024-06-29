@@ -107,7 +107,7 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
     return (
         <div
             style={{width: compositionSize?.width, height: compositionSize?.height}}
-            className="bg-white relative flex"
+            className="bg-background relative flex"
         >
             <style>
                 {`
