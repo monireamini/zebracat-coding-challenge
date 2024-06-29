@@ -1,3 +1,6 @@
+import {Dispatch, SetStateAction, RefObject} from 'react';
+import {PlayerRef} from '@remotion/player';
+
 export interface TextOverlayProps {
     /**
      * Identifier
@@ -61,7 +64,7 @@ export interface TextOverlayEditorProps {
     /**
      * Scale factor for video display in browser relative to original size
      */
-    scale: {x: number; y: number}
+    scale: { x: number; y: number }
 }
 
 export interface DraggableOverlayProps {
@@ -71,4 +74,59 @@ export interface DraggableOverlayProps {
     onStartEditing: () => void;
     onStopEditing: () => void;
     scale: { x: number; y: number };
+}
+
+export interface ToolbarProps {
+    /**
+     * Indicates whether the editor is in preview mode
+     */
+    previewMode: boolean;
+
+    /**
+     * Function to set the preview mode
+     */
+    setPreviewMode: Dispatch<SetStateAction<boolean>>;
+
+    /**
+     * Reference to the player component
+     */
+    playerRef: RefObject<PlayerRef>;
+
+    /**
+     * Size of the composition (width and height)
+     */
+    compositionSize: { width: number; height: number };
+
+    /**
+     * Function to set the composition size
+     */
+    setCompositionSize: Dispatch<SetStateAction<{ width: number; height: number }>>;
+
+    /**
+     * Size of the video (width and height)
+     */
+    videoSize: { width: number; height: number };
+
+    /**
+     * Input properties for the video editor
+     */
+    inputProps: {
+        videoData: string;
+        videoPosition: string;
+        textOverlays: TextOverlayProps[];
+    };
+
+    /**
+     * Function to set the input properties
+     */
+    setInputProps: Dispatch<SetStateAction<{
+        videoData: string;
+        videoPosition: string;
+        textOverlays: TextOverlayProps[];
+    }>>;
+
+    /**
+     * Function to set the video size
+     */
+    setVideoSize: Dispatch<SetStateAction<{ width: number; height: number }>>;
 }
