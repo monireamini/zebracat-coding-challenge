@@ -103,7 +103,14 @@ export default function Home() {
         // Calculate new dimensions based on the selected aspect ratio
         const [width, height] = newRatio.split(':').map(Number);
 
-        setCompositionSize(prev => ({width: prev.width, height: Math.floor(prev.width * height / width)}));
+        // The H264 codec does only support dimensions that are evenly divisible by two.
+        setCompositionSize(prev => {
+            const newHeight = Math.floor(prev.width * height / width);
+            return {
+                width: prev.width % 2 === 0 ? prev.width : prev.width - 1,
+                height: newHeight % 2 === 0 ? newHeight : newHeight - 1
+            };
+        });
     };
 
     const handleExportVideo = async () => {
@@ -419,18 +426,6 @@ export default function Home() {
                                 className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-[-6px] right-[-6px]"
                                 onMouseDown={handleResizeStart}
                             />
-                            {/*<div*/}
-                            {/*    className="absolute bg-emerald-400 cursor-nwse-resize border-white border-2 rounded-full h-[12px] w-[12px] top-[-6px] left-[-6px]"*/}
-                            {/*    onMouseDown={handleResizeStart}*/}
-                            {/*/>*/}
-                            {/*<div*/}
-                            {/*    className="absolute bg-emerald-400 cursor-nwse-resize border-white border-2 rounded-full h-[12px] w-[12px] bottom-[-6px] right-[-6px]"*/}
-                            {/*    onMouseDown={handleResizeStart}*/}
-                            {/*/>*/}
-                            {/*<div*/}
-                            {/*    className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] bottom-[-6px] left-[-6px]"*/}
-                            {/*    onMouseDown={handleResizeStart}*/}
-                            {/*/>*/}
                         </div>
                     )}
 
