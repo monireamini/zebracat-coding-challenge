@@ -416,20 +416,21 @@ export default function Home() {
                         >
                             {/* Resize handle */}
                             <div
-                                style={{
-                                    position: 'absolute',
-                                    top: '-5px',
-                                    right: '-5px',
-                                    width: '10px',
-                                    height: '10px',
-                                    borderRadius: '50%',
-                                    borderWidth: '2px',
-                                    borderColor: 'white',
-                                    backgroundColor: "green",
-                                    cursor: 'nesw-resize'
-                                }}
+                                className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-[-6px] right-[-6px]"
                                 onMouseDown={handleResizeStart}
                             />
+                            {/*<div*/}
+                            {/*    className="absolute bg-emerald-400 cursor-nwse-resize border-white border-2 rounded-full h-[12px] w-[12px] top-[-6px] left-[-6px]"*/}
+                            {/*    onMouseDown={handleResizeStart}*/}
+                            {/*/>*/}
+                            {/*<div*/}
+                            {/*    className="absolute bg-emerald-400 cursor-nwse-resize border-white border-2 rounded-full h-[12px] w-[12px] bottom-[-6px] right-[-6px]"*/}
+                            {/*    onMouseDown={handleResizeStart}*/}
+                            {/*/>*/}
+                            {/*<div*/}
+                            {/*    className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] bottom-[-6px] left-[-6px]"*/}
+                            {/*    onMouseDown={handleResizeStart}*/}
+                            {/*/>*/}
                         </div>
                     )}
 
