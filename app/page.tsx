@@ -24,6 +24,58 @@ export default function Home() {
     const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
     const [selectedAspectRatio, setSelectedAspectRatio] = useState<string>('16:9');
 
+    const [isDragging, setIsDragging] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+    const [dragStart, setDragStart] = useState({x: 0, y: 0});
+    const videoContainerRef = useRef(null);
+
+    const handleMouseDown = (e) => {
+        if (e.target === videoContainerRef.current) {
+            setIsDragging(true);
+            const [x, y] = inputProps.videoPosition.split(',').map(Number);
+            setDragStart({
+                x: e.clientX - x,
+                y: e.clientY - y
+            });
+        }
+    };
+
+    const handleMouseMove = useCallback((e) => {
+        if (isDragging) {
+            const newX = e.clientX - dragStart.x;
+            const newY = e.clientY - dragStart.y;
+            setInputProps(prev => ({
+                ...prev,
+                videoPosition: `${newX},${newY}`
+            }));
+        } else if (isResizing) {
+            const newWidth = Math.max(e.clientX - dragStart.x, 20); // Minimum width of 20px
+            const newHeight = Math.max(e.clientY - dragStart.y, 20); // Minimum height of 20px
+            setVideoSize({width: newWidth, height: newHeight});
+        }
+    }, [isDragging, isResizing, dragStart]);
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        setIsResizing(false);
+    };
+
+    const handleResizeStart = (e) => {
+        e.stopPropagation();
+        setIsResizing(true);
+        const [x, y] = inputProps.videoPosition.split(',').map(Number);
+        setDragStart({x: e.clientX - videoSize.width, y: e.clientY - videoSize.height});
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [handleMouseMove]);
+
     const handleAspectRatioChange = (newRatio: string) => {
         setSelectedAspectRatio(newRatio);
 
@@ -312,30 +364,57 @@ export default function Home() {
 
             {inputProps.videoData ? (
                 <div className="relative w-full border-2 border-green-500 rounded-[8px]"
-                     style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}>
-                    {/* Video player */}
-                    <div className="absolute inset-0">
-                        <Player
-                            ref={playerRef}
-                            component={VideoWithOverlays}
-                            durationInFrames={30 * 30}
-                            compositionWidth={compositionSize.width}
-                            compositionHeight={compositionSize.height}
-                            fps={30}
-                            clickToPlay={false}
-                            inputProps={{
-                                ...inputProps,
-                                videoSize,
-                                compositionSize,
-                                textOverlays: isPlaying ? inputProps.textOverlays : []
-                            }}
+                     style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}
+                >
+                    {/* Video container */}
+                    <div
+                        ref={videoContainerRef}
+                        className="absolute"
+                        style={{
+                            width: `${videoSize.width}px`,
+                            height: `${videoSize.height}px`,
+                            left: inputProps.videoPosition.split(',')[0] + 'px',
+                            top: inputProps.videoPosition.split(',')[1] + 'px',
+                            cursor: isDragging ? 'grabbing' : 'grab'
+                        }}
+                        onMouseDown={handleMouseDown}
+                    >
+                        {/* Resize handle */}
+                        <div
                             style={{
-                                width: '100%',
-                                height: '100%',
+                                position: 'absolute',
+                                right: '-5px',
+                                bottom: '-5px',
+                                width: '10px',
+                                height: '10px',
+                                background: 'white',
+                                cursor: 'nwse-resize'
                             }}
-                            controls
+                            onMouseDown={handleResizeStart}
                         />
                     </div>
+
+                    {/* Player component */}
+                    <Player
+                        ref={playerRef}
+                        component={VideoWithOverlays}
+                        durationInFrames={30 * 30}
+                        compositionWidth={compositionSize.width}
+                        compositionHeight={compositionSize.height}
+                        fps={30}
+                        clickToPlay={false}
+                        inputProps={{
+                            ...inputProps,
+                            videoSize,
+                            compositionSize,
+                            textOverlays: isPlaying ? inputProps.textOverlays : []
+                        }}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                        }}
+                        controls
+                    />
 
                     {/* Text overlay editor */}
                     {!isPlaying && (
