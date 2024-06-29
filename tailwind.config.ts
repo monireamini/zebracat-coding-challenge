@@ -14,6 +14,7 @@ export default {
         background: "#000000",
         foreground: "#FFFFFF",
         mediumGray: "#9CA3AF",
+        textBackground: "#22222266",
       },
     },
   },
