@@ -300,11 +300,11 @@ export default function Home() {
                         accept="video/*"
                         onChange={handleVideoUpload}
                         disabled={isUploading}
-                        className="block w-full text-sm text-foreground
+                        className="hidden w-full text-sm text-foreground
                     file:mr-4 file:py-2 file:px-4 file:rounded-md
                     file:border-0 file:text-sm file:font-semibold
                     file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-pink-100 hidden"
+                    hover:file:bg-pink-100"
                     />
                     <label
                         htmlFor="video-upload"
@@ -314,7 +314,7 @@ export default function Home() {
                     >
                         Select a video
                     </label>
-                    <label className="text-sm text-slate-500">{selectedFile}</label>
+                    <label className="text-sm text-slate-400">{selectedFile}</label>
                 </div>
 
 
