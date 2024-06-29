@@ -4,47 +4,50 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Player, PlayerRef} from '@remotion/player';
 import {VideoWithOverlays} from "../remotion/VideoWithOverlays";
 import {TextOverlayEditor} from "../components/TextOverlayEditor/TextOverlayEditor";
-
-const aspectRatios: string[] = ['16:9', '4:3', '1:1', '3:4', '9:16'];
+import {aspectRatios, initialInputProps} from "../types/constants";
+import {VideoWithOverlaysProps} from "../types/definitions";
+import {useVideoScale} from "../helpers/hooks/useVideoScale";
+import {calculateAspectRatio} from "../helpers/utils";
 
 export default function Home() {
-    const [isExporting, setIsExporting] = useState(false);
-    const [inputProps, setInputProps] = useState({
-        videoData: '',
-        videoPosition: '0,0',
-        textOverlays: []
-    });
+    const [inputProps, setInputProps] = useState(initialInputProps);
+
     const [isUploading, setIsUploading] = useState(false);
-    const [compositionSize, setCompositionSize] = useState({width: 1280, height: 720});
-    const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
-    const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
+    const [isExporting, setIsExporting] = useState(false);
+
+    // Dimensions of the final output video (in pixels)
+    const [compositionSize, setCompositionSize] = useState<VideoWithOverlaysProps["compositionSize"]>({
+        width: 1280,
+        height: 720
+    });
+
+    // Dimensions of the originally uploaded video (in pixels)
+    const [videoSize, setVideoSize] = useState<VideoWithOverlaysProps["videoSize"]>({width: 1280, height: 720});
+
+    // Original aspect ratio of the uploaded video (e.g., '16:9', '4:3')
+    const [videoAspectRatio, setVideoAspectRatio] = useState<string>('16:9');
+
+    // User-selected aspect ratio for the final output video
     const [selectedAspectRatio, setSelectedAspectRatio] = useState<string>('16:9');
 
-    const [isDragging, setIsDragging] = useState(false);
-    const [isResizing, setIsResizing] = useState(false);
-    const [dragStart, setDragStart] = useState({x: 0, y: 0});
+    // Indicates whether the video is currently being dragged within the composition
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+
+    // Indicates whether the video is currently being resized within the composition
+    const [isResizing, setIsResizing] = useState<boolean>(false);
+
+    // Starting coordinates for drag operations, used to calculate position changes
+    const [dragStart, setDragStart] = useState<{ x: number, y: number }>({x: 0, y: 0});
+
+    // Reference to the video container element for drag and resize operations
+    // Note: Video dimensions may differ from overall composition dimensions
     const videoContainerRef = useRef(null);
 
-    const [scale, setScale] = useState({x: 1, y: 1});
+    // Scale factor for displaying video in browser relative to original size
+    // x: (current composition width in browser) / (original uploaded video width)
+    // y: (current composition height in browser) / (original uploaded video height)
     const containerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const updateScale = () => {
-            if (containerRef.current) {
-                const containerWidth = containerRef.current.clientWidth;
-                const containerHeight = containerRef.current.clientHeight;
-                setScale({
-                    x: containerWidth / compositionSize.width,
-                    y: containerHeight / compositionSize.height,
-                });
-            }
-        };
-
-        updateScale();
-        window.addEventListener('resize', updateScale);
-        return () => window.removeEventListener('resize', updateScale);
-    }, [compositionSize]);
-
+    const scale = useVideoScale(compositionSize, containerRef);
 
     const handleMouseDown = (e) => {
         if (e.target === videoContainerRef.current) {
@@ -94,20 +97,26 @@ export default function Home() {
     }, [handleMouseMove]);
 
     const handleAspectRatioChange = (newRatio: string) => {
+        // Update the selected aspect ratio state
         setSelectedAspectRatio(newRatio);
 
-        // Calculate new dimensions based on the selected aspect ratio
+        // Extract width and height from the aspect ratio string (e.g., '16:9' -> [16, 9])
         const [width, height] = newRatio.split(':').map(Number);
 
-        // The H264 codec does only support dimensions that are evenly divisible by two.
+        // Update composition size based on the new aspect ratio
         setCompositionSize(prev => {
+            // Calculate new height while maintaining the current width
             const newHeight = Math.floor(prev.width * height / width);
+
+            // Ensure dimensions are even for H264 codec compatibility
             return {
+                // If width is odd, subtract 1 to make it even
                 width: prev.width % 2 === 0 ? prev.width : prev.width - 1,
+                // If calculated height is odd, subtract 1 to make it even
                 height: newHeight % 2 === 0 ? newHeight : newHeight - 1
             };
         });
-    };
+    }
 
     const handleExportVideo = async () => {
         setIsExporting(true);
@@ -210,14 +219,7 @@ export default function Home() {
         }
     };
 
-    function calculateAspectRatio(width: number, height: number): string {
-        const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
-        const divisor = gcd(width, height);
-        return `${width / divisor}:${height / divisor}`;
-    }
-
     const playerRef = useRef<PlayerRef>(null);
-
     const [isPlaying, setIsPlaying] = useState(false);
 
     const updatePlayingStatus = useCallback(() => {
@@ -234,8 +236,13 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [updatePlayingStatus]);
 
+    // Display text for the file input, shows "No file chosen" initially or the selected file name
     const [selectedFile, setSelectedFile] = useState("No file chosen");
-    const [previewMode, setPreviewMode] = useState(false)
+
+    // Controls the current mode of the video editor
+    // true: Preview mode - allows playing, pausing, seeking, and viewing animations
+    // false: Edit mode - enables adding text overlays, dragging, and resizing video within composition
+    const [previewMode, setPreviewMode] = useState(false);
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
@@ -381,7 +388,7 @@ export default function Home() {
             ) : (
                 <div
                     className="w-full p-16 mt-4 flex items-center justify-center border-2 border-mediumGray rounded-2xl text-xl text-mediumGray"
-                    onClick={() => document.getElementById('video-upload').click()}
+                    onClick={() => document.getElementById('video-upload')?.click?.()}
                 >
                     + upload a video to start editing
                 </div>
