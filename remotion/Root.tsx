@@ -34,7 +34,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
     const [x, y] = position.split(',').map(Number);
 
     const words = text.split(' ');
-    const loopDuration = 60
+    const loopDuration = 60;
+    const initialDelay = 30; // 1 second delay at 30 fps
 
     return (
         <div
@@ -53,8 +54,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
         >
             {words.map((word, i) => {
                 const delay = i * 5;
-                const loopFrame = frame % loopDuration;
-                const animatedOpacity = spring({
+                const loopFrame = Math.max(0, frame - initialDelay) % loopDuration;
+                const animatedOpacity = frame < initialDelay ? 1 : spring({
                     fps,
                     frame: loopFrame - delay,
                     config: {
@@ -63,7 +64,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
                     durationInFrames: loopDuration - 10, // Leave some frames for reset
                 });
 
-                const animatedY = interpolate(animatedOpacity, [0, 1], [20, 0]);
+                const animatedY = frame < initialDelay ? 0 : interpolate(animatedOpacity, [0, 1], [20, 0]);
 
                 return (
                     <span
