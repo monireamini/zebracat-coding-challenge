@@ -6,11 +6,21 @@ import {
     Video,
     useCurrentFrame,
     spring,
-    interpolate,
+    interpolate, staticFile, delayRender, continueRender,
 } from 'remotion';
-import { loadFont } from '@remotion/google-fonts/Roboto';
 
-const { fontFamily } = loadFont();
+const fontFamily = 'Poppins';
+const fontPath = staticFile('/Poppins-Regular.ttf');
+
+const loadFont = () => {
+    const font = new FontFace(fontFamily, `url(${fontPath})`);
+    const loadFontPromise = font.load().then(() => {
+        document.fonts.add(font);
+    });
+
+    const handle = delayRender();
+    loadFontPromise.then(() => continueRender(handle));
+};
 
 interface TextOverlayProps {
     text: string;
@@ -28,9 +38,9 @@ interface VideoWithOverlaysProps {
     videoSize: { width: number; height: number };
 }
 
-const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
+const TextOverlay: React.FC<TextOverlayProps> = ({text, position}) => {
     const frame = useCurrentFrame();
-    const { fps } = useVideoConfig();
+    const {fps} = useVideoConfig();
     const [x, y] = position.split(',').map(Number);
 
     const words = text.split(' ');
@@ -43,7 +53,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position }) => {
                 position: 'absolute',
                 left: x,
                 top: y,
-                fontFamily,
+                fontFamily: `${fontFamily}, sans-serif`,
                 fontSize: '24px',
                 fontWeight: 'bold',
                 color: 'white',
@@ -90,6 +100,9 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
                                                                         compositionSize,
                                                                         videoSize
                                                                     }) => {
+
+    loadFont();
+
     const {durationInFrames} = useVideoConfig();
     const [videoX, videoY] = videoPosition.split(',').map(Number);
 
@@ -101,6 +114,17 @@ export const VideoWithOverlays: React.FC<VideoWithOverlaysProps> = ({
             width: compositionSize?.width,
             height: compositionSize?.height
         }}>
+            <style>
+                {`
+                    @font-face {
+                        font-family: '${fontFamily}';
+                        src: url(${fontPath}) format('truetype');
+                        font-weight: normal;
+                        font-style: normal;
+                    }
+                `}
+            </style>
+
             {videoData && (
                 <Video
                     src={videoData}
