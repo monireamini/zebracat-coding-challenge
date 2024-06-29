@@ -274,11 +274,10 @@ export default function Home() {
         }
     };
 
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-start mb-4">
-                <h1 className="text-xl font-semibold">Video Editing Environment</h1>
+                <h1 className="text-2xl font-semibold text-blue-500">Video Editing Environment</h1>
                 <button
                     onClick={handleExportVideo}
                     disabled={isExporting || !inputProps.videoData}
@@ -323,51 +322,6 @@ export default function Home() {
                     </div>
                 )}
             </div>
-
-            {inputProps.videoData && (
-                <div className="mb-4 w-full flex flex-row justify-start items-center">
-                    <div className="mr-2">
-                        <label htmlFor="videoWidth" className="block text-sm">Width</label>
-                        <input
-                            id="videoWidth"
-                            type="number"
-                            value={videoSize.width}
-                            onChange={(e) => handleVideoSizeChange(e, 'width')}
-                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
-                        />
-                    </div>
-                    <div className="mr-4">
-                        <label htmlFor="videoHeight" className="block text-sm">Height</label>
-                        <input
-                            id="videoHeight"
-                            type="number"
-                            value={videoSize.height}
-                            onChange={(e) => handleVideoSizeChange(e, 'height')}
-                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
-                        />
-                    </div>
-                    <div className="mr-2">
-                        <label htmlFor="videoPositionX" className="block text-sm">Position X</label>
-                        <input
-                            id="videoPositionX"
-                            type="number"
-                            value={inputProps.videoPosition.split(',')[0]}
-                            onChange={(e) => handleVideoPositionChange(e, 'x')}
-                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="videoPositionY" className="block text-sm">Position Y</label>
-                        <input
-                            id="videoPositionY"
-                            type="number"
-                            value={inputProps.videoPosition.split(',')[1]}
-                            onChange={(e) => handleVideoPositionChange(e, 'y')}
-                            className="border-mediumGray border-2 rounded-xl font-bold py-2 px-4 disabled:opacity-50"
-                        />
-                    </div>
-                </div>
-            )}
 
             {inputProps.videoData ? (
                 <div
