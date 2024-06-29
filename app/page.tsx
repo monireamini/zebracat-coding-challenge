@@ -9,16 +9,12 @@ const aspectRatios: string[] = ['16:9', '4:3', '1:1', '3:4', '9:16'];
 
 export default function Home() {
     const [isExporting, setIsExporting] = useState(false);
-    const [exportMessage, setExportMessage] = useState('');
     const [inputProps, setInputProps] = useState({
         videoData: '',
         videoPosition: '0,0',
-        textOverlays: [
-            {id: "1", text: 'Initial Text', position: '100,200'},
-        ]
+        textOverlays: []
     });
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadMessage, setUploadMessage] = useState('');
     const [compositionSize, setCompositionSize] = useState({width: 1280, height: 720});
     const [videoSize, setVideoSize] = useState({width: 1280, height: 720});
     const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
@@ -115,7 +111,6 @@ export default function Home() {
 
     const handleExportVideo = async () => {
         setIsExporting(true);
-        setExportMessage('Exporting video...');
 
         try {
             const response = await fetch('/api/export-video', {
@@ -137,13 +132,12 @@ export default function Home() {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
-                setExportMessage('Video exported successfully! Check your downloads.');
             } else {
                 const text = await response.text();
                 throw new Error(text || 'Failed to export video');
             }
         } catch (error) {
-            setExportMessage(`Error: ${error.message}`);
+            console.log('error: ', error)
         } finally {
             setIsExporting(false);
         }
@@ -157,6 +151,9 @@ export default function Home() {
     }
 
     const addNewTextOverlay = () => {
+        playerRef?.current?.pause()
+        setPreviewMode(false)
+
         const newOverlay = {
             id: Date.now(),
             text: 'New Text',
@@ -173,7 +170,6 @@ export default function Home() {
         setSelectedFile(file?.name)
         if (file) {
             setIsUploading(true);
-            setUploadMessage('Uploading video...');
 
             const formData = new FormData();
             formData.append('video', file);
@@ -190,7 +186,6 @@ export default function Home() {
                         ...prev,
                         videoData: data.videoUrl
                     }));
-                    setUploadMessage('Video uploaded successfully!');
 
                     // Create a video element to get the dimensions
                     const video = document.createElement('video');
@@ -208,7 +203,7 @@ export default function Home() {
                     throw new Error('Failed to upload video');
                 }
             } catch (error) {
-                setUploadMessage(`Error: ${error.message}`);
+                console.log('error: ', error)
             } finally {
                 setIsUploading(false);
             }
@@ -239,55 +234,33 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [updatePlayingStatus]);
 
-    const handleVideoSizeChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
-        const value = e.target.value;
-        const numericValue = parseInt(value);
-        const [aspectWidth, aspectHeight] = videoAspectRatio.split(':').map(Number);
-
-        if (value === '') {
-            // Allow clearing the input
-            setVideoSize(prev => ({...prev, [dimension]: ''}));
-        } else if (!isNaN(numericValue) && numericValue >= 0) {
-            let newSize;
-            if (dimension === 'width') {
-                newSize = {
-                    width: numericValue,
-                    height: Math.round(numericValue * (aspectHeight / aspectWidth))
-                };
-            } else {
-                newSize = {
-                    width: Math.round(numericValue * (aspectWidth / aspectHeight)),
-                    height: numericValue
-                };
-            }
-            setVideoSize(newSize);
-        }
-    };
-
-    const handleVideoPositionChange = (e: React.ChangeEvent<HTMLInputElement>, axis: 'x' | 'y') => {
-        const value = e.target.value;
-        const numericValue = parseInt(value);
-
-        if (value === '' || !isNaN(numericValue)) {
-            const [x, y] = inputProps.videoPosition.split(',').map(Number);
-            const newPosition = axis === 'x' ? `${value},${y}` : `${x},${value}`;
-            setInputProps(prev => ({...prev, videoPosition: newPosition}));
-        }
-    };
-
     const [selectedFile, setSelectedFile] = useState("No file chosen");
+    const [previewMode, setPreviewMode] = useState(false)
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-start mb-4">
                 <h1 className="text-2xl font-semibold text-blue-500">Video Editing Environment</h1>
-                <button
-                    onClick={handleExportVideo}
-                    disabled={isExporting || !inputProps.videoData}
-                    className="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-                >
-                    {isExporting ? 'Exporting...' : 'Export Video'}
-                </button>
+                <div>
+                    <button
+                        onClick={() => setPreviewMode((prev) => {
+                            if (!prev) playerRef?.current?.play?.()
+                            else playerRef?.current?.pause?.()
+                            return !prev
+                        })}
+                        disabled={isExporting || !inputProps.videoData}
+                        className="mr-4 bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                    >
+                        {previewMode ? 'Switch to Edit Mode' : 'Switch to Preview Mode'}
+                    </button>
+                    <button
+                        onClick={handleExportVideo}
+                        disabled={isExporting || !inputProps.videoData}
+                        className="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                    >
+                        {isExporting ? 'Exporting...' : 'Export Video'}
+                    </button>
+                </div>
             </div>
 
             <p className="self-start mb-3 text-lg">Select a video to enhance with dynamic text overlays!</p>
@@ -362,17 +335,17 @@ export default function Home() {
                             ...inputProps,
                             videoSize,
                             compositionSize,
-                            textOverlays: isPlaying ? inputProps.textOverlays : []
+                            textOverlays: isPlaying && previewMode ? inputProps.textOverlays : []
                         }}
                         style={{
                             width: '100%',
                             height: '100%',
                         }}
-                        controls
+                        controls={previewMode}
                     />
 
                     {/* Video container */}
-                    {!isPlaying && (
+                    {!isPlaying && !previewMode && (
                         <div
                             ref={videoContainerRef}
                             className="absolute"
@@ -387,14 +360,14 @@ export default function Home() {
                         >
                             {/* Resize handle */}
                             <div
-                                className="absolute bg-blue-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-0 right-0"
+                                className="absolute bg-emerald-400 cursor-nesw-resize border-white border-2 rounded-full h-[12px] w-[12px] top-0 right-0"
                                 onMouseDown={handleResizeStart}
                             />
                         </div>
                     )}
 
                     {/* Text overlay editor */}
-                    {!isPlaying && (
+                    {!isPlaying && !previewMode && (
                         <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
                             <TextOverlayEditor
                                 overlays={inputProps.textOverlays}
