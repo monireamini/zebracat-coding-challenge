@@ -7,6 +7,9 @@ import {
     useCurrentFrame,
     spring,
 } from 'remotion';
+import { loadFont } from '@remotion/google-fonts/Roboto';
+
+const {fontFamily} = loadFont();
 
 interface TextOverlayProps {
     text: string;
@@ -49,6 +52,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ text, position, animationDura
                 position: 'absolute',
                 left: x,
                 top: y,
+                fontFamily,
                 fontSize: '24px',
                 fontWeight: 'bold',
                 color: 'white',
