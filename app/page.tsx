@@ -382,7 +382,7 @@ export default function Home() {
             {inputProps.videoData ? (
                 <div
                     ref={containerRef}
-                    className="relative w-full border-2 border-green-500 rounded-[8px]"
+                    className="relative w-full border-2 border-green-500 rounded-[8px] overflow-hidden"
                     style={{aspectRatio: `${compositionSize.width} / ${compositionSize.height}`}}
                 >
                     {/* Player component */}
