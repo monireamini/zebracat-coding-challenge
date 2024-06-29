@@ -169,6 +169,43 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [updatePlayingStatus]);
 
+    const handleVideoSizeChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
+        const value = e.target.value;
+        const numericValue = parseInt(value);
+        const [aspectWidth, aspectHeight] = videoAspectRatio.split(':').map(Number);
+
+        if (value === '') {
+            // Allow clearing the input
+            setVideoSize(prev => ({...prev, [dimension]: ''}));
+        } else if (!isNaN(numericValue) && numericValue >= 0) {
+            let newSize;
+            if (dimension === 'width') {
+                newSize = {
+                    width: numericValue,
+                    height: Math.round(numericValue * (aspectHeight / aspectWidth))
+                };
+            } else {
+                newSize = {
+                    width: Math.round(numericValue * (aspectWidth / aspectHeight)),
+                    height: numericValue
+                };
+            }
+            setVideoSize(newSize);
+        }
+    };
+
+    const handleVideoPositionChange = (e: React.ChangeEvent<HTMLInputElement>, axis: 'x' | 'y') => {
+        const value = e.target.value;
+        const numericValue = parseInt(value);
+
+        if (value === '' || !isNaN(numericValue)) {
+            const [x, y] = inputProps.videoPosition.split(',').map(Number);
+            const newPosition = axis === 'x' ? `${value},${y}` : `${x},${value}`;
+            setInputProps(prev => ({...prev, videoPosition: newPosition}));
+        }
+    };
+
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-start p-6 max-w-full overflow-x-hidden">
             <div className="flex flex-row w-full justify-between items-center mb-4">
@@ -227,6 +264,51 @@ export default function Home() {
                     </div>
                 )}
             </div>
+
+            {inputProps.videoData && (
+                <div className="mb-4 grid grid-cols-4 gap-4">
+                    <div>
+                        <label htmlFor="videoWidth" className="block text-white">Video Width:</label>
+                        <input
+                            id="videoWidth"
+                            type="number"
+                            value={videoSize.width}
+                            onChange={(e) => handleVideoSizeChange(e, 'width')}
+                            className="border rounded px-2 py-1 w-full"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="videoHeight" className="block text-white">Video Height:</label>
+                        <input
+                            id="videoHeight"
+                            type="number"
+                            value={videoSize.height}
+                            onChange={(e) => handleVideoSizeChange(e, 'height')}
+                            className="border rounded px-2 py-1 w-full"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="videoPositionX" className="block text-white">Video Position X:</label>
+                        <input
+                            id="videoPositionX"
+                            type="number"
+                            value={inputProps.videoPosition.split(',')[0]}
+                            onChange={(e) => handleVideoPositionChange(e, 'x')}
+                            className="border rounded px-2 py-1 w-full"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="videoPositionY" className="block text-white">Video Position Y:</label>
+                        <input
+                            id="videoPositionY"
+                            type="number"
+                            value={inputProps.videoPosition.split(',')[1]}
+                            onChange={(e) => handleVideoPositionChange(e, 'y')}
+                            className="border rounded px-2 py-1 w-full"
+                        />
+                    </div>
+                </div>
+            )}
 
             {inputProps.videoData ? (
                 <div className="relative w-full border-2 border-green-500 rounded-[8px]"
