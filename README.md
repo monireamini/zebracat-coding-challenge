@@ -105,7 +105,7 @@ user's device storage.
 3. **Resize and Reposition Video**: Ability to resize and reposition the video within the composition.
 4. **Aspect Ratio Control**: Change the aspect ratio of the composition (16:9, 4:3, 1:1, 3:4, 9:16).
 5. **Preview Mode**: Play, pause, and seek through the video to see animations and text overlays.
-6. **Edit Mode**: Add and drag text overlays within the composition.
+6. **Edit Mode**: Add, edit and drag text overlays as well as resize and reposition the video within the composition.
 7. **Video Export**: Export the edited video with all applied overlays and modifications.
 
 ## Workflow
@@ -113,8 +113,6 @@ user's device storage.
 1. **User Interface Initialization:**
 
 - Defined in `app/page.tsx` as the Home component.
-- For text overlays, we use a `TextOverlayEditor` component, a transparent overlay on top of the composition player.
-  This makes it easy to add, drag, and update texts.
 
 2. **Video Data Generation:**
 
@@ -132,7 +130,7 @@ user's device storage.
 - The composition player is used for previewing the result video by passing the generated input props in
   the `page.tsx` component.
 - This overlay makes it easier to add texts, drag them, and update their content.
-- The data is stored in `inputProps.textOverlays` with the following type:
+- The data is stored in `inputProps.textOverlays`.
 
 4. **Handling Video Data, Position, and Size:**
 
