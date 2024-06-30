@@ -6,7 +6,7 @@ adding text overlays, adjusting aspect ratios, and exporting the final video.
 
 ## Demonstration Video
 
-You can view a simple screen recording demonstrating the functionality of the application [here](https://shorturl.at/wrPmJ).
+You can view a simple screen recording demonstrating the functionality of the application [here](https://shorturl.at/fA914).
 
 
 ## GitHub Repository
@@ -53,10 +53,6 @@ cd zebracat-coding-challenge
 
 ```
 yarn install
-```
-or 
-```
-npm install
 ```
 
 4. Start the Next.js dev server:
