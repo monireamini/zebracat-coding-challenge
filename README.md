@@ -95,7 +95,7 @@ user's device storage.
 
 ### types/
 
-- `constants.ts`: Constants like default composition input props and list of aspect rations
+- `constants.ts`: Constants like default composition input props and list of aspect ratios
 - `definitions.ts`: Typescript Type definitions
 
 ## Key Features
@@ -105,7 +105,7 @@ user's device storage.
 3. **Resize and Reposition Video**: Ability to resize and reposition the video within the composition.
 4. **Aspect Ratio Control**: Change the aspect ratio of the composition (16:9, 4:3, 1:1, 3:4, 9:16).
 5. **Preview Mode**: Play, pause, and seek through the video to see animations and text overlays.
-6. **Edit Mode**: Add texts, drag and resize text overlays within the composition.
+6. **Edit Mode**: Add and drag text overlays within the composition.
 7. **Video Export**: Export the edited video with all applied overlays and modifications.
 
 ## Workflow
