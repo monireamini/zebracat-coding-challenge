@@ -46,7 +46,7 @@ git clone git@github.com:monireamini/zebracat-coding-challenge.git
 2. Navigate to the project directory:
 
 ```
-cd video-generator-next
+cd zebracat-coding-challenge
 ```
 
 3. Install dependencies:
