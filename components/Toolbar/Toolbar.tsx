@@ -13,6 +13,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                                                     inputProps,
                                                     setInputProps,
                                                     setVideoSize,
+                                                    setVideoDuration,
                                                 }) => {
 
     const [isUploading, setIsUploading] = useState(false);
@@ -55,11 +56,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     video.onloadedmetadata = () => {
                         const width = video.videoWidth;
                         const height = video.videoHeight;
+                        const duration = Math.ceil(Math.abs(video.duration));
                         const currentAspectRatio = calculateAspectRatio(width, height)
                         setVideoSize({width, height});
                         setCompositionSize({width, height})
                         setVideoAspectRatio(currentAspectRatio);
                         setSelectedAspectRatio(currentAspectRatio);
+                        setVideoDuration(duration)
                     };
                 } else {
                     throw new Error('Failed to upload video');
@@ -210,7 +213,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         <select
                             value={selectedAspectRatio}
                             onChange={(e) => handleAspectRatioChange(e.target.value as string)}
-                            className="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                            className="appearance-none bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded disabled:opacity-50"
                         >
                             {(aspectRatios.includes(videoAspectRatio) ? aspectRatios : [videoAspectRatio, ...aspectRatios]).map((ratio) => (
                                 <option key={ratio} value={ratio}>

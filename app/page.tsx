@@ -18,6 +18,9 @@ export default function Home() {
         height: 720
     });
 
+    // Duration of the originally uploaded video (in seconds)
+    const [videoDuration, setVideoDuration] = useState(10); // default 10 seconds
+
     // Dimensions of the originally uploaded video (in pixels)
     const [videoSize, setVideoSize] = useState<VideoWithOverlaysProps["videoSize"]>({width: 1280, height: 720});
 
@@ -128,6 +131,7 @@ export default function Home() {
                 inputProps={inputProps}
                 setInputProps={setInputProps}
                 setVideoSize={setVideoSize}
+                setVideoDuration={setVideoDuration}
             />
 
             {inputProps.videoData ? (
@@ -140,7 +144,7 @@ export default function Home() {
                     <Player
                         ref={playerRef}
                         component={VideoWithOverlays}
-                        durationInFrames={30 * 30}
+                        durationInFrames={30 * videoDuration}
                         compositionWidth={compositionSize.width}
                         compositionHeight={compositionSize.height}
                         fps={30}
