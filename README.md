@@ -9,11 +9,6 @@ adding text overlays, adjusting aspect ratios, and exporting the final video.
 You can view a simple screen recording demonstrating the functionality of the application [here](https://shorturl.at/fA914).
 
 
-## GitHub Repository
-
-The GitHub repository for this project can be found at [here](https://github.com/monireamini/zebracat-coding-challenge).
-
-
 ## Setup instructions
 
 ### Prerequisites
