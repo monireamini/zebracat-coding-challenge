@@ -20,6 +20,7 @@
  * Process:
  * 1. Bundle the Remotion composition
  * 2. Read and process the input video file
+ * Sets video data in base64 to avoid empty frames
  * 3. Calculate video duration and frame count
  * 4. Render the composition using Remotion's renderMedia
  * 5. Save the output video with a timestamp-based filename
