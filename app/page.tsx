@@ -98,21 +98,6 @@ export default function Home() {
     }
 
     const playerRef = useRef<PlayerRef>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    const updatePlayingStatus = useCallback(() => {
-        if (playerRef.current) {
-            setIsPlaying(playerRef.current.isPlaying());
-        }
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            updatePlayingStatus();
-        }, 100); // Check every 100ms
-
-        return () => clearInterval(interval);
-    }, [updatePlayingStatus]);
 
     // Controls the current mode of the video editor
     // true: Preview mode - allows playing, pausing, seeking, and viewing animations
@@ -153,7 +138,7 @@ export default function Home() {
                             ...inputProps,
                             videoSize,
                             compositionSize,
-                            textOverlays: isPlaying && previewMode ? inputProps.textOverlays : []
+                            textOverlays: previewMode ? inputProps.textOverlays : []
                         }}
                         style={{
                             width: '100%',
@@ -163,7 +148,7 @@ export default function Home() {
                     />
 
                     {/* Virtual video container for drag and resize operations */}
-                    {!isPlaying && !previewMode && (
+                    {!previewMode && (
                         <div
                             ref={videoContainerRef}
                             className="absolute"
@@ -185,7 +170,7 @@ export default function Home() {
                     )}
 
                     {/* Text overlay editor */}
-                    {!isPlaying && !previewMode && (
+                    {!previewMode && (
                         <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
                             <TextOverlayEditor
                                 overlays={inputProps.textOverlays}
