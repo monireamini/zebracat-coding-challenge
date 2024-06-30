@@ -129,4 +129,9 @@ export interface ToolbarProps {
      * Function to set the video size
      */
     setVideoSize: Dispatch<SetStateAction<{ width: number; height: number }>>;
+
+    /**
+     * Function to set the video duration in seconds
+     */
+    setVideoDuration: Dispatch<SetStateAction<number>>;
 }
