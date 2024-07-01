@@ -114,25 +114,7 @@ user's device storage.
 
 - Defined in `app/page.tsx` as the Home component.
 
-2. **Video Data Generation:**
-
-- We use an input for uploading a video, extracting its metadata (width, height).
-- The video and composition dimensions are set to the uploaded video’s dimensions, maintaining the aspect ratio for
-  future use.
-- The video is stored in the public directory as `video-{timestamp}.mp4`.
-- Initially, the composition aspect ratio matches the video aspect ratio, which can later be changed via a select button
-  on the app toolbar.
-
-3. **Handling Text Overlays:**
-
-- We are not manipulating the composition component directly.
-- Defined a `TextOverlayEditor` that is a transparent overlay on top of the composition player.
-- The composition player is used for previewing the result video by passing the generated input props in
-  the `page.tsx` component.
-- This overlay makes it easier to add texts, drag them, and update their content.
-- The data is stored in `inputProps.textOverlays`.
-
-4. **Handling Video Data, Position, and Size:**
+2. **Handling Video Data, Position, and Size:**
 
 - We use an input for uploading a video.
 - Extract metadata like width and height.
@@ -151,7 +133,17 @@ user's device storage.
   to the composition components.
 - Updated the video dimension and position on the player accordingly.
 
-5. **Screen Size Adjustment:**
+
+3. **Handling Text Overlays:**
+
+- We are not manipulating the composition component directly.
+- Defined a `TextOverlayEditor` that is a transparent overlay on top of the composition player.
+- The composition player is used for previewing the result video by passing the generated input props in
+  the `page.tsx` component.
+- This overlay makes it easier to add texts, drag them, and update their content.
+- The data is stored in `inputProps.textOverlays`.
+
+4. **Screen Size Adjustment:**
 
 - We tried to use the full width of the user's screen size for the composition area and adjusted its height based on the
   occupied width.
@@ -163,7 +155,7 @@ user's device storage.
   rendered mode on the player, as well as in the final rendered video.
 - A scale variable is used to calculate the correct position (x, y) for overlay elements.
 
-6. **Handling Player Controls:**
+5. **Handling Player Controls:**
 
 - Due to the virtual div over the player for demonstrating video resizing, the player control buttons (play/pause, etc.)
   are sometimes inaccessible.
@@ -176,7 +168,7 @@ user's device storage.
 - When the user tries to edit again, it automatically switches to edit mode.
 - Users can switch between modes via a button in the toolbar.
 
-7. **Export Functionality:**
+6. **Export Functionality:**
 
 - Defined in a `render.js` script responsible for rendering the composition with input props.
 - Server-side API in `/app/api/export-video/route.js` handles the export process.
