@@ -125,7 +125,7 @@ user's device storage.
 - Initially, use the aspect ratio of the video as the composition aspect ratio, which can be changed later via a select
   button on the app toolbar.
 - To support resizing and repositioning the video part of the composition Added a virtual div with a transparent
-  background over the player but behind the `TextOverlayEditor`.
+  background over the `player` but behind the `TextOverlayEditor`.
 - Made the virtual div resizable and draggable, with a green circle as the resize handle.
 - Ensured the video aspect ratio is maintained during resizing.
 - Handled negative positions relative to the composition.
@@ -161,7 +161,7 @@ user's device storage.
   are sometimes inaccessible.
 - A better approach would be to implement custom controls outside the composition box. However, as a quick fix, we have
   added two different modes.
-- Two modes are provided: preview and edit. In edit mode, controls are hidden to prevent access issues.
+- Two modes are provided: preview and edit.
 - In edit mode, controls are hidden because the user cannot click on them.
 - Switching to preview mode automatically plays the video and hides all virtual elements to show the final result of the
   composition with animation and the ability to play, pause, and seek the video.
